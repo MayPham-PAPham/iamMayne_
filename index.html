@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSK 1 Master 3.0 with PhAnhh - Luyện Pinyin, Sắp xếp câu & Nghe chép</title>
+    <title>HSK 1 Master 3.0 - Luyện Pinyin, Sắp xếp câu & Nghe chép</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & Noto Sans SC -->
@@ -277,7 +277,7 @@
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <p class="text-sm font-medium text-slate-600">
                         <i class="fa-solid fa-keyboard text-brand-red mr-1.5"></i>
-                        Quan sát các từ Hán tự đã xáo trộn, tự sắp xếp và <strong>gõ Pinyin của cả câu</strong> vào ô bên dưới:
+                        Quan sát các từ Hán tự đã xáo trộn, tự sắp xếp và <strong>gõ lại cả câu bằng chữ Hán</strong> vào ô bên dưới:
                     </p>
                     <span id="ord-status-pill" class="hidden text-xs font-bold px-2.5 py-1 rounded-full"></span>
                 </div>
@@ -296,13 +296,13 @@
                 <!-- Typing Input Area -->
                 <div class="mb-6">
                     <label for="ord-user-input" class="block text-sm font-bold text-slate-700 mb-2">
-                        Tự gõ Pinyin của câu (có thể gõ có dấu hoặc không dấu):
+                        Tự gõ lại câu bằng chữ Hán:
                     </label>
                     <input type="text" id="ord-user-input" autocomplete="off" spellcheck="false"
-                        placeholder="Ví dụ: wo shi xue sheng / wǒ shì xuéshēng"
+                        placeholder="Ví dụ: 我是学生"
                         class="w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition">
                     <p class="text-xs text-slate-400 mt-1.5">
-                        * Mẹo: Tự gõ Pinyin, không bấm vào các thẻ Hán tự. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh. Hệ thống tự bỏ qua dấu câu (。？！，) và khoảng trắng.
+                        * Mẹo: Tự gõ chữ Hán bằng bàn phím tiếng Trung, không bấm vào các thẻ từ. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh. Hệ thống tự bỏ qua dấu câu và khoảng trắng.
                     </p>
                 </div>
 
@@ -342,7 +342,7 @@
                             
                             <!-- Character-by-character comparison for Ordering -->
                             <div id="ord-char-diff-wrapper" class="mt-3 p-3 bg-white rounded-xl border border-slate-200">
-                                <div class="text-[11px] font-semibold text-slate-400 uppercase mb-1">Đối chiếu Pinyin bạn gõ:</div>
+                                <div class="text-[11px] font-semibold text-slate-400 uppercase mb-1">Đối chiếu chữ Hán bạn gõ:</div>
                                 <div id="ord-char-diff" class="text-xl chinese-text tracking-widest font-bold flex flex-wrap gap-1"></div>
                             </div>
 
@@ -620,8 +620,8 @@
                         <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 1: Sắp xếp câu</h3>
                         <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
                     </div>
-                    <div id="sum-ord-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                        <!-- Rendered dynamically -->
+                    <div id="sum-ord-list" class="p-5 text-sm text-slate-500">
+                        Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
                     </div>
                 </div>
 
@@ -631,8 +631,8 @@
                         <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 2: Luyện nghe chép</h3>
                         <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
                     </div>
-                    <div id="sum-dic-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                        <!-- Rendered dynamically -->
+                    <div id="sum-dic-list" class="p-5 text-sm text-slate-500">
+                        Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
                     </div>
                 </div>
             </div>
@@ -1117,6 +1117,26 @@ function doGet(e) {
                     checkOrderingAnswer();
                 }
             });
+            document.getElementById('ord-user-input').addEventListener('input', () => {
+                if (!currentStudentId || !studentsData[currentStudentId]) return;
+                const student = studentsData[currentStudentId];
+                student.drafts = student.drafts || { ordering: {}, dictation: {} };
+                student.drafts.ordering = student.drafts.ordering || {};
+                student.drafts.ordering[ORDERING_QUESTIONS[ordIndex].id] = document.getElementById('ord-user-input').value;
+                student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+                student.progress.orderingIndex = ordIndex;
+                saveToLocalStorage();
+            });
+            document.getElementById('dic-user-input').addEventListener('input', () => {
+                if (!currentStudentId || !studentsData[currentStudentId]) return;
+                const student = studentsData[currentStudentId];
+                student.drafts = student.drafts || { ordering: {}, dictation: {} };
+                student.drafts.dictation = student.drafts.dictation || {};
+                student.drafts.dictation[DICTATION_QUESTIONS[dicIndex].id] = document.getElementById('dic-user-input').value;
+                student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+                student.progress.dictationIndex = dicIndex;
+                saveToLocalStorage();
+            });
 
             document.getElementById('dic-user-input').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1151,6 +1171,10 @@ function doGet(e) {
                     student.pinyinReveals = student.pinyinReveals || {};
                     student.ordering = student.ordering || {};
                     student.dictation = student.dictation || {};
+                    student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+                    student.drafts = student.drafts || { ordering: {}, dictation: {} };
+                    student.drafts.ordering = student.drafts.ordering || {};
+                    student.drafts.dictation = student.drafts.dictation || {};
                 });
 
                 const rawTeacher = localStorage.getItem(TEACHER_IMPORTED_KEY);
@@ -1297,7 +1321,9 @@ function doGet(e) {
                 dictation: {},
                 coins: 0,
                 hintsUsed: 0,
-                pinyinReveals: {}
+                pinyinReveals: {},
+                progress: { orderingIndex: 0, dictationIndex: 0 },
+                drafts: { ordering: {}, dictation: {} }
             };
             input.value = '';
             saveToLocalStorage();
@@ -1340,8 +1366,10 @@ function doGet(e) {
             document.getElementById('header-student-name').textContent = student.name;
             document.getElementById('login-modal').classList.add('hidden');
             
-            initOrderingQuestion(0);
-            initDictationQuestion(0);
+            student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+            student.drafts = student.drafts || { ordering: {}, dictation: {} };
+            initOrderingQuestion(Math.min(Math.max(Number(student.progress.orderingIndex || 0), 0), ORDERING_QUESTIONS.length - 1));
+            initDictationQuestion(Math.min(Math.max(Number(student.progress.dictationIndex || 0), 0), DICTATION_QUESTIONS.length - 1));
             updateBadgesAndSummary();
             queueGoogleSheetsSync();
         }
@@ -1440,7 +1468,13 @@ function doGet(e) {
 
             // Reset input & feedback
             const inputEl = document.getElementById('ord-user-input');
-            inputEl.value = '';
+            const activeStudent = studentsData[currentStudentId];
+            if (activeStudent) {
+                activeStudent.progress = activeStudent.progress || { orderingIndex: 0, dictationIndex: 0 };
+                activeStudent.drafts = activeStudent.drafts || { ordering: {}, dictation: {} };
+                activeStudent.progress.orderingIndex = index;
+            }
+            inputEl.value = activeStudent?.drafts?.ordering?.[q.id] || '';
             inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition';
             document.getElementById('ord-feedback').classList.add('hidden');
 
@@ -1462,6 +1496,7 @@ function doGet(e) {
             }
 
             renderOrderingQuestion();
+            if (currentStudentId && studentsData[currentStudentId]) saveToLocalStorage();
         }
 
         function renderOrderingQuestion() {
@@ -1521,6 +1556,13 @@ function doGet(e) {
         function resetCurrentOrdering() {
             const inputEl = document.getElementById('ord-user-input');
             inputEl.value = '';
+            if (currentStudentId && studentsData[currentStudentId]) {
+                const q = ORDERING_QUESTIONS[ordIndex];
+                studentsData[currentStudentId].drafts = studentsData[currentStudentId].drafts || { ordering: {}, dictation: {} };
+                studentsData[currentStudentId].drafts.ordering = studentsData[currentStudentId].drafts.ordering || {};
+                delete studentsData[currentStudentId].drafts.ordering[q.id];
+                saveToLocalStorage();
+            }
             inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition';
             document.getElementById('ord-feedback').classList.add('hidden');
             inputEl.focus();
@@ -1552,11 +1594,11 @@ function doGet(e) {
             const q = ORDERING_QUESTIONS[ordIndex];
             const inputEl = document.getElementById('ord-user-input');
             const rawInput = inputEl.value;
-            const cleanUser = normalizePinyin(rawInput);
-            const cleanTarget = normalizePinyin(q.pinyin);
+            const cleanUser = normalizeChinese(rawInput);
+            const cleanTarget = normalizeChinese(q.answer);
 
             if (!cleanUser) {
-                showToast('Bạn hãy tự gõ Pinyin của cả câu trước khi kiểm tra!', 'error');
+                showToast('Bạn hãy tự gõ cả câu bằng chữ Hán trước khi kiểm tra!', 'error');
                 inputEl.focus();
                 return;
             }
@@ -1579,6 +1621,8 @@ function doGet(e) {
                     userAnswer: rawInput.trim(),
                     firstCorrectAt: previous?.firstCorrectAt || (isCorrect ? new Date().toISOString() : null)
                 };
+                student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+                if (isCorrect) student.progress.orderingIndex = Math.min(ordIndex + 1, ORDERING_QUESTIONS.length - 1);
                 saveToLocalStorage();
                 const hintsUsed = Number(student.hintsUsed || 0);
                 const freeRemaining = Math.max(0, FREE_PINYIN_HINTS - hintsUsed);
@@ -1586,7 +1630,7 @@ function doGet(e) {
                 if (counter) counter.textContent = `${freeRemaining} lượt miễn phí còn lại · sau đó ${PINYIN_HINT_COST} xu/lượt · Ví: ${Number(student.coins || 0)} xu`;
             }
 
-            // Hiển thị đối chiếu Pinyin
+            // Hiển thị đối chiếu từng chữ Hán
             document.getElementById('ord-char-diff').innerHTML = buildCharacterDiffHtml(cleanUser, cleanTarget);
 
             const feedbackEl = document.getElementById('ord-feedback');
@@ -1611,7 +1655,7 @@ function doGet(e) {
                 inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-rose-400 bg-rose-50/40 focus:outline-none transition';
                 feedbackEl.className = 'mt-6 p-5 rounded-2xl border border-rose-200 bg-rose-50/80 transition-all';
                 titleEl.className = 'font-bold text-base flex items-center gap-2 text-rose-700';
-                titleEl.innerHTML = '<i class="fa-solid fa-circle-xmark text-xl"></i> Chưa khớp hoàn toàn, bạn xem phần đối chiếu Pinyin bên dưới nhé!';
+                titleEl.innerHTML = '<i class="fa-solid fa-circle-xmark text-xl"></i> Chưa khớp hoàn toàn, bạn xem phần đối chiếu chữ Hán bên dưới nhé!';
             }
 
             const statusPill = document.getElementById('ord-status-pill');
@@ -1657,10 +1701,17 @@ function doGet(e) {
             const unitBucket = Math.floor(dicIndex / 10);
             document.getElementById('dic-unit-select').value = String(unitBucket);
 
-            document.getElementById('dic-user-input').value = '';
+            const activeStudent = studentsData[currentStudentId];
+            if (activeStudent) {
+                activeStudent.progress = activeStudent.progress || { orderingIndex: 0, dictationIndex: 0 };
+                activeStudent.drafts = activeStudent.drafts || { ordering: {}, dictation: {} };
+                activeStudent.progress.dictationIndex = index;
+            }
+            document.getElementById('dic-user-input').value = activeStudent?.drafts?.dictation?.[q.id] || '';
             document.getElementById('dic-feedback').classList.add('hidden');
             document.getElementById('dic-hint-box').classList.add('hidden');
             document.getElementById('dic-hint-text').textContent = q.pinyin;
+            if (currentStudentId && studentsData[currentStudentId]) saveToLocalStorage();
         }
 
         function toggleDictationHint() {
@@ -1669,6 +1720,13 @@ function doGet(e) {
 
         function clearDictationInput() {
             document.getElementById('dic-user-input').value = '';
+            if (currentStudentId && studentsData[currentStudentId]) {
+                const q = DICTATION_QUESTIONS[dicIndex];
+                studentsData[currentStudentId].drafts = studentsData[currentStudentId].drafts || { ordering: {}, dictation: {} };
+                studentsData[currentStudentId].drafts.dictation = studentsData[currentStudentId].drafts.dictation || {};
+                delete studentsData[currentStudentId].drafts.dictation[q.id];
+                saveToLocalStorage();
+            }
             document.getElementById('dic-feedback').classList.add('hidden');
             document.getElementById('dic-user-input').focus();
         }
@@ -1741,6 +1799,9 @@ function doGet(e) {
                     isCorrect: isCorrect,
                     userInput: rawInput.trim()
                 };
+                const student = studentsData[currentStudentId];
+                student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
+                if (isCorrect) student.progress.dictationIndex = Math.min(dicIndex + 1, DICTATION_QUESTIONS.length - 1);
                 saveToLocalStorage();
             }
 
@@ -1913,51 +1974,12 @@ function doGet(e) {
                 rankEl.className = 'text-xl font-extrabold text-slate-600 mt-1';
             }
 
-            // Chi tiết 100 câu Sắp xếp
+            // Ẩn toàn bộ câu hỏi, câu trả lời và đáp án ở trang kết quả.
+            // Chỉ hiển thị số liệu tổng hợp; giáo viên xem chi tiết trong Góc Giáo Viên.
             const ordListEl = document.getElementById('sum-ord-list');
-            ordListEl.innerHTML = ORDERING_QUESTIONS.map((q, idx) => {
-                const rec = student.ordering?.[q.id];
-                let badge = '<span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">Chưa làm</span>';
-                if (rec) {
-                    badge = rec.isCorrect 
-                        ? '<span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">Đúng</span>'
-                        : '<span class="text-xs px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">Sai</span>';
-                }
-                return `
-                    <div onclick="switchTab('ordering'); initOrderingQuestion(${idx})"
-                        class="px-5 py-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer transition">
-                        <div class="pr-3">
-                            <span class="text-xs font-bold text-slate-400 mr-1.5">#${idx + 1}</span>
-                            <span class="text-sm font-medium text-slate-800 chinese-text">${q.answer}</span>
-                            <p class="text-[11px] text-slate-400">${q.unit}</p>
-                        </div>
-                        ${badge}
-                    </div>
-                `;
-            }).join('');
-
-            // Chi tiết 100 câu Nghe
             const dicListEl = document.getElementById('sum-dic-list');
-            dicListEl.innerHTML = DICTATION_QUESTIONS.map((q, idx) => {
-                const rec = student.dictation?.[q.id];
-                let badge = '<span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">Chưa làm</span>';
-                if (rec) {
-                    badge = rec.isCorrect 
-                        ? '<span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">Đúng</span>'
-                        : '<span class="text-xs px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">Sai</span>';
-                }
-                return `
-                    <div onclick="switchTab('dictation'); initDictationQuestion(${idx})"
-                        class="px-5 py-2.5 flex items-center justify-between hover:bg-slate-50 cursor-pointer transition">
-                        <div class="pr-3">
-                            <span class="text-xs font-bold text-slate-400 mr-1.5">#${idx + 1}</span>
-                            <span class="text-sm font-medium text-slate-800 chinese-text">${q.hanzi}</span>
-                            <p class="text-[11px] text-slate-400">${q.topic}</p>
-                        </div>
-                        ${badge}
-                    </div>
-                `;
-            }).join('');
+            if (ordListEl) ordListEl.textContent = 'Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
+            if (dicListEl) dicListEl.textContent = 'Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
         }
 
         function copyTextFallback(text) {
