@@ -96,7 +96,7 @@
                 <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-md">
                     <span class="chinese-text text-3xl font-bold">汉语</span>
                 </div>
-                <h2 class="text-2xl font-bold tracking-tight">HSK 1 Master 3.0</h2>
+                <h2 class="text-2xl font-bold tracking-tight">HSK 1 Master 3.0 with PhAnhhh</h2>
                 <p class="text-orange-100 text-sm mt-1">Hệ thống luyện Sắp xếp câu & Nghe chép chính tả</p>
             </div>
             
@@ -181,7 +181,7 @@
                     <span class="chinese-text font-bold text-lg">中文</span>
                 </div>
                 <div>
-                    <h1 class="font-bold text-slate-800 text-base sm:text-lg leading-tight">HSK 1 Master 3.0</h1>
+                    <h1 class="font-bold text-slate-800 text-base sm:text-lg leading-tight">HSK 1 Master 3.0 with PhAnhhh</h1>
                     <p class="text-xs text-slate-500 hidden sm:block">Ôn luyện theo đề cương HSK 3.0 cấp 1</p>
                 </div>
             </div>
@@ -394,7 +394,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
                 <div class="bg-gradient-to-br from-teal-50 to-emerald-50/60 border border-teal-200/80 rounded-2xl p-6 text-center mb-6">
                     <p class="text-xs font-bold uppercase tracking-wider text-brand-teal mb-3">
-                        <i class="fa-solid fa-ear-listen mr-1"></i> Nghe câu tiếng Trung và gõ lại chữ Hán (Phím tắt: Alt + R để nghe lại)
+                        <i class="fa-solid fa-ear-listen mr-1"></i> Nghe câu tiếng Trung và gõ lại chữ Hán 
                     </p>
                     
                     <div class="flex flex-wrap items-center justify-center gap-4">
@@ -1521,7 +1521,7 @@ function doGet(e) {
             const freeUsed = Number(student.hintsUsed || 0);
             if (freeUsed >= FREE_PINYIN_HINTS) {
                 if (Number(student.coins || 0) < PINYIN_HINT_COST) {
-                    showToast(`Bạn cần ${PINYIN_HINT_COST} xu để mở Pinyin. Hãy làm đúng câu để nhận xu nhé!`, 'error');
+                    showToast(`Bạn cần ${PINYIN_HINT_COST} xu để mở Pinyin. Có làm thì mới có xu`, 'error');
                     return;
                 }
                 student.coins -= PINYIN_HINT_COST;
