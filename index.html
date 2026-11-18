@@ -86,7 +86,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Toast Notification Container (Replaces alert) -->
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- Student Login / Profile Selection Modal -->
@@ -134,9 +134,7 @@
                         <span class="flex-shrink mx-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Hoặc chọn học viên đã lưu</span>
                         <div class="flex-grow border-t border-slate-200"></div>
                     </div>
-                    <div id="saved-students-list" class="max-h-48 overflow-y-auto space-y-2 pr-1">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="saved-students-list" class="max-h-48 overflow-y-auto space-y-2 pr-1"></div>
                 </div>
             </div>
         </div>
@@ -178,7 +176,6 @@
     <!-- Top Navigation Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <!-- Brand Logo -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-red to-orange-500 text-white flex items-center justify-center shadow-sm">
                     <span class="chinese-text font-bold text-lg">中文</span>
@@ -189,7 +186,6 @@
                 </div>
             </div>
 
-            <!-- Active Student Pill -->
             <div class="flex items-center gap-2 bg-orange-50 border border-orange-200/80 px-3 py-1.5 rounded-full">
                 <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span class="text-xs font-medium text-slate-500 hidden sm:inline">Học viên:</span>
@@ -201,7 +197,7 @@
             </div>
         </div>
 
-        <!-- 3 Main Navigation Tabs -->
+        <!-- 4 Main Navigation Tabs -->
         <div class="max-w-5xl mx-auto px-4">
             <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar" aria-label="Tabs">
                 <button onclick="switchTab('ordering')" id="tab-btn-ordering"
@@ -235,7 +231,6 @@
 
         <!-- ==================== TAB 1: SENTENCE ORDERING (100 QUESTIONS - TYPING MODE) ==================== -->
         <section id="section-ordering" class="space-y-5">
-            <!-- Unit Filter & Top Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5 flex-wrap">
@@ -243,12 +238,14 @@
                             Câu <span id="ord-current-num">1</span> / <span id="ord-total-num">100</span>
                         </span>
                         <span id="ord-grammar-tag" class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">
-                            Bài 1: Chào hỏi & Đại từ
+                            Bài 1: Chào hỏi & Giới thiệu
+                        </span>
+                        <span class="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i>Tự lưu tiến độ trên máy
                         </span>
                     </div>
 
                     <div class="flex items-center gap-3 flex-wrap">
-                        <!-- Lesson Unit Filter -->
                         <select id="ord-unit-select" onchange="filterOrderingByUnit(this.value)"
                             class="text-xs font-semibold bg-orange-50 border border-orange-200 rounded-xl px-2.5 py-1.5 text-brand-red focus:outline-none focus:ring-2 focus:ring-brand-red">
                             <option value="all">Tất cả 100 câu</option>
@@ -264,7 +261,6 @@
                             <option value="9">Bài 10 (Câu 91 - 100)</option>
                         </select>
 
-                        <!-- Question Selector Dropdown -->
                         <select id="ord-question-select" onchange="jumpToOrdering(this.value)"
                             class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red max-w-[190px]">
                         </select>
@@ -272,37 +268,34 @@
                 </div>
             </div>
 
-            <!-- Question Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <p class="text-sm font-medium text-slate-600">
                         <i class="fa-solid fa-keyboard text-brand-red mr-1.5"></i>
-                        Quan sát các từ Hán tự đã xáo trộn, tự sắp xếp và <strong>gõ lại cả câu bằng chữ Hán</strong> vào ô bên dưới:
+                        Quan sát các từ bị xáo trộn (ví dụ: <span class="chinese-text font-semibold text-slate-800">我 / 学生 / 是</span>) và <strong>tự gõ lại cả câu bằng bàn phím</strong> (ví dụ: <span class="chinese-text font-semibold text-brand-red">我是学生</span>):
                     </p>
                     <span id="ord-status-pill" class="hidden text-xs font-bold px-2.5 py-1 rounded-full"></span>
                 </div>
 
                 <!-- Scrambled Word Bank Display -->
                 <div class="mb-5 p-4 rounded-2xl bg-orange-50/50 border border-orange-200/80">
-                    <div class="flex items-center justify-between mb-2.5">
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Các từ Hán tự bị xáo trộn:</span>
+                    <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Các từ bị xáo trộn:</span>
                         <span id="ord-hint-counter" class="text-[11px] font-semibold text-amber-700">5 lượt Pinyin đầu tiên miễn phí (toàn tài khoản) · sau đó 500 xu/lượt</span>
                     </div>
-                    <div id="ord-word-bank" class="flex flex-wrap gap-2.5">
-                        <!-- Scrambled Word chips injected by JS -->
-                    </div>
+                    <div id="ord-word-bank" class="flex flex-wrap items-center gap-2"></div>
                 </div>
 
                 <!-- Typing Input Area -->
                 <div class="mb-6">
                     <label for="ord-user-input" class="block text-sm font-bold text-slate-700 mb-2">
-                        Tự gõ lại câu bằng chữ Hán:
+                        Tự gõ lại câu sắp xếp từ bàn phím:
                     </label>
                     <input type="text" id="ord-user-input" autocomplete="off" spellcheck="false"
                         placeholder="Ví dụ: 我是学生"
                         class="w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition">
                     <p class="text-xs text-slate-400 mt-1.5">
-                        * Mẹo: Tự gõ chữ Hán bằng bàn phím tiếng Trung, không bấm vào các thẻ từ. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh. Hệ thống tự bỏ qua dấu câu và khoảng trắng.
+                        * Tự gõ chữ Hán bằng bàn phím. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh. Hệ thống tự bỏ qua dấu câu và khoảng trắng.
                     </p>
                 </div>
 
@@ -340,7 +333,6 @@
                         <div class="flex-1">
                             <h4 id="ord-feedback-title" class="font-bold text-base flex items-center gap-2"></h4>
                             
-                            <!-- Character-by-character comparison for Ordering -->
                             <div id="ord-char-diff-wrapper" class="mt-3 p-3 bg-white rounded-xl border border-slate-200">
                                 <div class="text-[11px] font-semibold text-slate-400 uppercase mb-1">Đối chiếu chữ Hán bạn gõ:</div>
                                 <div id="ord-char-diff" class="text-xl chinese-text tracking-widest font-bold flex flex-wrap gap-1"></div>
@@ -367,7 +359,6 @@
 
         <!-- ==================== TAB 2: LISTENING DICTATION (100 QUESTIONS) ==================== -->
         <section id="section-dictation" class="hidden space-y-5">
-            <!-- Top Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 flex-wrap">
                     <span class="bg-brand-tealLight text-brand-teal font-bold px-3 py-1.5 rounded-xl text-sm">
@@ -379,7 +370,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap">
-                    <!-- Lesson Unit Filter for Dictation -->
                     <select id="dic-unit-select" onchange="filterDictationByUnit(this.value)"
                         class="text-xs font-semibold bg-teal-50 border border-teal-200 rounded-xl px-2.5 py-1.5 text-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal">
                         <option value="all">Tất cả 100 câu</option>
@@ -401,23 +391,19 @@
                 </div>
             </div>
 
-            <!-- Dictation Workspace Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
-                <!-- Audio Player Controls -->
                 <div class="bg-gradient-to-br from-teal-50 to-emerald-50/60 border border-teal-200/80 rounded-2xl p-6 text-center mb-6">
                     <p class="text-xs font-bold uppercase tracking-wider text-brand-teal mb-3">
                         <i class="fa-solid fa-ear-listen mr-1"></i> Nghe câu tiếng Trung và gõ lại chữ Hán (Phím tắt: Alt + R để nghe lại)
                     </p>
                     
                     <div class="flex flex-wrap items-center justify-center gap-4">
-                        <!-- Play Normal Speed -->
                         <button onclick="playDictationAudio(1.0)" id="btn-play-normal"
                             class="relative px-6 py-3.5 rounded-2xl bg-brand-teal hover:bg-teal-800 text-white font-bold text-sm shadow-md transition flex items-center gap-2.5 cursor-pointer">
                             <i class="fa-solid fa-volume-high text-lg"></i>
                             <span>Nghe chuẩn (1.0x)</span>
                         </button>
 
-                        <!-- Play Slow Speed -->
                         <button onclick="playDictationAudio(0.65)" id="btn-play-slow"
                             class="px-5 py-3.5 rounded-2xl bg-white hover:bg-teal-50 text-brand-teal border border-teal-300 font-bold text-sm shadow-xs transition flex items-center gap-2 cursor-pointer">
                             <i class="fa-solid fa-gauge-simple-low"></i>
@@ -430,7 +416,6 @@
                     </p>
                 </div>
 
-                <!-- Input Area -->
                 <div class="mb-5">
                     <div class="flex items-center justify-between mb-2">
                         <label for="dic-user-input" class="text-sm font-bold text-slate-700">
@@ -442,7 +427,6 @@
                         </button>
                     </div>
 
-                    <!-- Optional Pinyin Hint Box -->
                     <div id="dic-hint-box" class="hidden mb-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-sm text-amber-900 font-medium">
                         <span class="font-bold">Gợi ý Pinyin:</span> <span id="dic-hint-text"></span>
                     </div>
@@ -455,7 +439,6 @@
                     </p>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-2">
                         <button onclick="clearDictationInput()"
@@ -479,17 +462,14 @@
                     </button>
                 </div>
 
-                <!-- Character Diff & Result Feedback -->
                 <div id="dic-feedback" class="hidden mt-6 p-5 rounded-2xl border transition-all">
                     <h4 id="dic-feedback-title" class="font-bold text-base flex items-center gap-2 mb-3"></h4>
                     
-                    <!-- Character by character comparison -->
                     <div class="mb-4 p-3.5 bg-white rounded-xl border border-slate-200">
                         <div class="text-xs font-semibold text-slate-400 uppercase mb-1.5">So sánh từng ký tự bạn gõ:</div>
                         <div id="dic-char-diff" class="text-2xl chinese-text tracking-widest font-bold flex flex-wrap gap-1"></div>
                     </div>
 
-                    <!-- Standard Reference Answer -->
                     <div class="space-y-1 bg-white/70 p-3.5 rounded-xl border border-slate-200/80">
                         <div class="text-xs font-semibold text-slate-400 uppercase">Đáp án chuẩn HSK 3.0 cấp 1:</div>
                         <p class="text-xl font-bold chinese-text text-slate-900" id="dic-correct-hanzi"></p>
@@ -503,7 +483,6 @@
 
         <!-- ==================== TAB 3: COURSE SUMMARY & STUDENT SUBMISSION ==================== -->
         <section id="section-summary" class="hidden space-y-6">
-            <!-- Header Banner -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-red bg-brand-redLight px-2.5 py-1 rounded-lg">Báo cáo học tập cá nhân</span>
@@ -530,7 +509,6 @@
                 </div>
             </div>
 
-            <!-- Student Submission Token Box -->
             <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
                     <div>
@@ -551,9 +529,8 @@
                     class="w-full p-2.5 text-xs font-mono bg-white border border-amber-300 rounded-xl text-slate-600 focus:outline-none"></textarea>
             </div>
 
-            <!-- 4 KPI Cards -->
+            <!-- 5 KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Ordering Score -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
                         <span>Sắp xếp câu</span>
@@ -567,7 +544,6 @@
                     </div>
                 </div>
 
-                <!-- Dictation Score -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
                         <span>Luyện nghe chép</span>
@@ -581,7 +557,6 @@
                     </div>
                 </div>
 
-                <!-- Overall Accuracy -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
                         <span>Tỷ lệ hoàn thành</span>
@@ -591,7 +566,6 @@
                     <p class="text-xs text-slate-500 mt-2" id="sum-total-done">Đã làm 0/200 câu</p>
                 </div>
 
-                <!-- Student Coins -->
                 <div class="bg-white p-5 rounded-2xl border border-amber-200 shadow-xs">
                     <div class="flex items-center justify-between text-amber-700 text-xs font-semibold uppercase mb-2">
                         <span>Ví xu</span>
@@ -601,7 +575,6 @@
                     <p class="text-xs text-slate-500 mt-2">+100 xu cho mỗi câu sắp xếp đúng lần đầu</p>
                 </div>
 
-                <!-- Course Rank / Evaluation -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
                         <span>Đánh giá HSK 1</span>
@@ -612,32 +585,14 @@
                 </div>
             </div>
 
-            <!-- Detailed Breakdown Tables -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Ordering Details -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 1: Sắp xếp câu</h3>
-                        <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
-                    </div>
-                    <div id="sum-ord-list" class="p-5 text-sm text-slate-500">
-                        Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
-                    </div>
-                </div>
-
-                <!-- Dictation Details -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 2: Luyện nghe chép</h3>
-                        <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
-                    </div>
-                    <div id="sum-dic-list" class="p-5 text-sm text-slate-500">
-                        Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
-                    </div>
-                </div>
+            <!-- Danh sách câu hỏi và đáp án được ẩn tại trang kết quả -->
+            <div id="sum-hidden-answers-notice" class="bg-white rounded-2xl border border-slate-200/80 p-5 text-sm text-slate-500 flex items-center gap-3">
+                <i class="fa-solid fa-eye-slash text-slate-400 text-lg"></i>
+                <span>Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để tránh xem trước đáp án. Giáo viên có thể xem chi tiết bài làm trong <strong>Góc Giáo Viên</strong>.</span>
             </div>
+            <div id="sum-ord-list" class="hidden"></div>
+            <div id="sum-dic-list" class="hidden"></div>
 
-            <!-- Reset Student Data Danger Zone -->
             <div class="flex justify-end pt-2">
                 <button onclick="confirmResetStudentProgress()"
                     class="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3.5 py-2 rounded-xl transition cursor-pointer">
@@ -646,9 +601,8 @@
             </div>
         </section>
 
-        <!-- ==================== TAB 4: TEACHER DASHBOARD (QUẢN LÝ LỚP HỌC) ==================== -->
+        <!-- ==================== TAB 4: TEACHER DASHBOARD ==================== -->
         <section id="section-teacher" class="hidden space-y-6">
-            <!-- Teacher Lock Screen -->
             <div id="teacher-lock-screen" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 max-w-md mx-auto text-center">
                 <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -667,9 +621,7 @@
                 <p class="text-[11px] text-slate-400 mt-3">Mật khẩu được xác thực ở máy chủ Apps Script; không đặt mật khẩu trong file HTML.</p>
             </div>
 
-            <!-- Teacher Unlocked Content -->
             <div id="teacher-workspace" class="hidden space-y-6">
-                <!-- Top Header -->
                 <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-lg">Teacher Dashboard</span>
@@ -693,9 +645,7 @@
                     </div>
                 </div>
 
-                <!-- Import Methods Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Method 1: Paste Sync Codes -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-1">
@@ -703,7 +653,7 @@
                                 Cách 1: Dán Mã Nộp Bài của học viên (Hỗ trợ dán nhiều mã cùng lúc)
                             </h3>
                             <p class="text-xs text-slate-500 mb-3">
-                                Copy các chuỗi <code class="bg-slate-100 px-1 rounded">HSK1_...</code> học viên gửi qua Zalo/Messenger và dán vào ô dưới đây (mỗi mã 1 dòng hoặc cách nhau khoảng trắng):
+                                Copy các chuỗi <code class="bg-slate-100 px-1 rounded">HSK1_...</code> học viên gửi qua Zalo/Messenger và dán vào ô dưới đây:
                             </p>
                             <textarea id="teacher-import-tokens" rows="4"
                                 placeholder="Dán 1 hoặc nhiều mã HSK1_eyJ... vào đây..."
@@ -722,7 +672,6 @@
                         </div>
                     </div>
 
-                    <!-- Method 2: Google Sheets Webhook Setup -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-1">
@@ -746,9 +695,9 @@
                             <ol class="list-decimal list-inside space-y-1.5 mt-2 text-slate-600">
                                 <li>Tạo Google Sheet mới, mở <strong>Extensions → Apps Script</strong>.</li>
                                 <li>Xóa mã cũ, dán toàn bộ mã ở khung bên dưới rồi lưu.</li>
-                                <li>Trong <strong>Project Settings → Script properties</strong>, thêm <code>TEACHER_PASSWORD</code> (mật khẩu riêng) và <code>SPREADSHEET_ID</code> (ID nằm giữa <code>/d/</code> và <code>/edit</code> trong URL Google Sheet).</li>
-                                <li>Chọn <strong>Deploy → New deployment → Web app</strong>; chạy dưới tài khoản của bạn, quyền truy cập chọn <strong>Anyone</strong>.</li>
-                                <li>Sao chép URL kết thúc bằng <code>/exec</code>, dán vào ô URL phía trên và gửi URL đó cho học viên.</li>
+                                <li>Trong <strong>Project Settings → Script properties</strong>, thêm <code>TEACHER_PASSWORD</code> và <code>SPREADSHEET_ID</code>.</li>
+                                <li>Chọn <strong>Deploy → New deployment → Web app</strong>, chạy dưới tài khoản của bạn, quyền truy cập chọn <strong>Anyone</strong>.</li>
+                                <li>Sao chép URL kết thúc bằng <code>/exec</code> và dán vào ô URL phía trên.</li>
                             </ol>
                             <button type="button" onclick="copyAppsScriptCode()" class="mt-3 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold">Sao chép mã Apps Script</button>
                             <pre id="apps-script-code" class="mt-2 p-3 bg-slate-900 text-emerald-300 rounded-lg overflow-x-auto font-mono text-[10px] leading-relaxed whitespace-pre">function getSheet_() {
@@ -832,12 +781,10 @@ function doGet(e) {
     return jsonOut_({ok:false, error:String(err)}, callback);
   }
 }</pre>
-                            <p class="mt-2 text-[10px] text-slate-500">Lưu ý: bảng tính nên để riêng tư. Google Apps Script kiểm tra mật khẩu phía máy chủ trước khi trả kết quả giáo viên; học viên chỉ có quyền gửi bài.</p>
                         </details>
                     </div>
                 </div>
 
-                <!-- Top 3 leaderboard (teacher-only) -->
                 <div class="bg-white rounded-2xl border border-amber-200 shadow-xs p-5">
                     <div class="flex items-center justify-between gap-3 mb-3">
                         <h3 class="font-bold text-slate-800"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Bảng xếp hạng Top 3 theo xu</h3>
@@ -848,7 +795,6 @@ function doGet(e) {
                     </div>
                 </div>
 
-                <!-- Class Leaderboard & Roster Table -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
                         <div>
@@ -876,18 +822,15 @@ function doGet(e) {
                                     <th class="py-3 px-4 font-bold text-right">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="teacher-roster-tbody" class="divide-y divide-slate-100 text-sm">
-                                <!-- Rendered dynamically -->
-                            </tbody>
+                            <tbody id="teacher-roster-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Class Weakness Analytics (Câu học viên hay sai nhất) -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
                         <i class="fa-solid fa-chart-simple text-rose-500"></i>
-                        Thống kê Top câu hỏi học viên hay làm sai nhất (Để giáo viên ôn tập trên lớp)
+                        Thống kê Top câu hỏi học viên hay làm sai nhất
                     </h3>
                     <div id="teacher-weakness-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                         <p class="text-slate-400 italic">Chưa có đủ dữ liệu lỗi sai để thống kê.</p>
@@ -910,16 +853,14 @@ function doGet(e) {
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            <div id="td-modal-body" class="p-6 overflow-y-auto space-y-4 text-sm">
-                <!-- Injected dynamically -->
-            </div>
+            <div id="td-modal-body" class="p-6 overflow-y-auto space-y-4 text-sm"></div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-10 py-5 px-4">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <p>© 2026 <strong>HSK 1 Master 3.0</strong> — 100 câu Pinyin + 100 câu nghe chép chọn lọc theo danh sách từ vựng HSK 3.0 cấp 1 (300 từ).</p>
+            <p>© 2026 <strong>HSK 1 Master 3.0</strong> — 100 câu sắp xếp + 100 câu nghe chép chọn lọc theo danh sách từ vựng HSK 3.0 cấp 1 (300 từ).</p>
             <button onclick="toggleGithubModal(true)"
                 class="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-brand-red bg-slate-100 hover:bg-orange-50 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <i class="fa-brands fa-github text-sm"></i>
@@ -928,13 +869,59 @@ function doGet(e) {
         </div>
     </footer>
 
-    <!-- Application Data & Logic -->
     <script>
+        // =========================================================================
+        // TIỆN ÍCH GIAO DIỆN CHUNG (ESCAPE HTML, TOAST, MODAL)
+        // =========================================================================
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const styleMap = {
+                success: 'bg-emerald-700 text-white border-emerald-800',
+                error: 'bg-rose-700 text-white border-rose-800',
+                info: 'bg-slate-800 text-white border-slate-900'
+            };
+            const iconMap = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-exclamation',
+                info: 'fa-circle-info'
+            };
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-medium flex items-center gap-2.5 transition-all ${styleMap[type] || styleMap.info}`;
+            toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} shrink-0"></i><span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-6px)';
+                setTimeout(() => toast.remove(), 220);
+            }, 3200);
+        }
+
+        function toggleGithubModal(show) {
+            const modal = document.getElementById('github-modal');
+            if (!modal) return;
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
         // =========================================================================
         // 1. NGÂN HÀNG 100 CÂU SẮP XẾP CHUẨN HSK 1 (CHIA 10 BÀI - MỖI BÀI 10 CÂU)
         // =========================================================================
-        // HSK 3.0 cấp 1: bộ câu luyện tự biên soạn theo danh sách 300 từ vựng trong đề cương mới.
-        // Mỗi thẻ gồm một đơn vị từ vựng; học viên tự viết Pinyin, không thể bấm thẻ để chèn đáp án.
         const HSK1_V3_PINYIN = {
             '我':'wǒ','是':'shì','好':'hǎo','了':'le','学生':'xuéshēng','你':'nǐ','老师':'lǎoshī','吗':'ma','他':'tā','大学生':'dàxuéshēng','她':'tā','我们':'wǒmen','同学':'tóngxué','你们':'nǐmen','他们':'tāmen','中国':'Zhōngguó','人':'rén','不':'bù','大家':'dàjiā','都':'dōu','很':'hěn','高兴':'gāoxìng',
             '的':'de','妈妈':'māma','在':'zài','家':'jiā','爸爸':'bàba','公司':'gōngsī','工作':'gōngzuò','做饭':'zuòfàn','哥哥':'gēge','姐姐':'jiějie','弟弟':'dìdi','喜欢':'xǐhuan','玩':'wán','妹妹':'mèimei','吃':'chī','苹果':'píngguǒ','有':'yǒu','一':'yī','个':'gè','两':'liǎng','女儿':'nǚ’ér','几':'jǐ',
@@ -1081,14 +1068,13 @@ function doGet(e) {
         const FREE_PINYIN_HINTS = 5;
 
         let currentStudentId = null;
-        let studentsData = {}; // Dữ liệu học viên làm trên máy này
-        let teacherImportedData = {}; // Dữ liệu học viên giáo viên import qua Mã Nộp Bài / CSV
-        let teacherCloudData = {}; // Dữ liệu được tải từ Google Sheets sau khi giáo viên xác thực
+        let studentsData = {};
+        let teacherImportedData = {};
+        let teacherCloudData = {};
         let teacherPassSession = null;
         let teacherUnlocked = false;
         let syncTimer = null;
 
-        // Trạng thái bài tập hiện tại
         let ordIndex = 0;
         let ordShuffledWords = [];
         let dicIndex = 0;
@@ -1098,7 +1084,6 @@ function doGet(e) {
             populateDropdowns();
             renderSavedStudentsList();
             checkWebhookVisibility();
-            // Nếu thiết bị mất mạng rồi kết nối lại, tự gửi lại hồ sơ học viên đang mở.
             window.addEventListener('online', () => queueGoogleSheetsSync());
             const studentWebhookInput = document.getElementById('student-webhook-url');
             if (studentWebhookInput) studentWebhookInput.value = localStorage.getItem(TEACHER_WEBHOOK_KEY) || '';
@@ -1110,7 +1095,6 @@ function doGet(e) {
                 openLoginModal();
             }
 
-            // Phím tắt Enter cho cả 2 phần
             document.getElementById('ord-user-input').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -1145,7 +1129,6 @@ function doGet(e) {
                 }
             });
 
-            // Phím tắt Alt + R để phát lại âm thanh nghe nhanh
             document.addEventListener('keydown', (e) => {
                 if (e.altKey && (e.key === 'r' || e.key === 'R')) {
                     const dicSec = document.getElementById('section-dictation');
@@ -1237,7 +1220,6 @@ function doGet(e) {
             }
             const student = studentsData[currentStudentId];
             try {
-                // no-cors + text/plain tránh yêu cầu preflight của Apps Script Web App.
                 await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -1346,12 +1328,13 @@ function doGet(e) {
                 const s = studentsData[id];
                 const ordDone = Object.values(s.ordering || {}).filter(x => x.isCorrect).length;
                 const dicDone = Object.values(s.dictation || {}).filter(x => x.isCorrect).length;
+                const nextOrdNum = Math.min(Math.max(Number(s.progress?.orderingIndex || 0) + 1, 1), ORDERING_QUESTIONS.length);
                 return `
                     <div onclick="selectStudent('${id}')"
                         class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-brand-red hover:bg-orange-50/50 cursor-pointer transition">
                         <div>
                             <div class="font-bold text-sm text-slate-800">${escapeHtml(s.name)}</div>
-                            <div class="text-xs text-slate-500">Sắp xếp: ${ordDone}/${ORDERING_QUESTIONS.length} • Nghe: ${dicDone}/${DICTATION_QUESTIONS.length}</div>
+                            <div class="text-xs text-slate-500">Sắp xếp: ${ordDone}/${ORDERING_QUESTIONS.length} • Nghe: ${dicDone}/${DICTATION_QUESTIONS.length} • Đang ở câu ${nextOrdNum}</div>
                         </div>
                         <span class="text-xs font-semibold text-brand-red bg-brand-redLight px-2.5 py-1 rounded-lg">Tiếp tục &rarr;</span>
                     </div>
@@ -1368,10 +1351,13 @@ function doGet(e) {
             
             student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
             student.drafts = student.drafts || { ordering: {}, dictation: {} };
-            initOrderingQuestion(Math.min(Math.max(Number(student.progress.orderingIndex || 0), 0), ORDERING_QUESTIONS.length - 1));
-            initDictationQuestion(Math.min(Math.max(Number(student.progress.dictationIndex || 0), 0), DICTATION_QUESTIONS.length - 1));
+            const resumeOrd = Math.min(Math.max(Number(student.progress.orderingIndex || 0), 0), ORDERING_QUESTIONS.length - 1);
+            const resumeDic = Math.min(Math.max(Number(student.progress.dictationIndex || 0), 0), DICTATION_QUESTIONS.length - 1);
+            initOrderingQuestion(resumeOrd);
+            initDictationQuestion(resumeDic);
             updateBadgesAndSummary();
             queueGoogleSheetsSync();
+            showToast(`Đã tải tiến độ của ${student.name} (bắt đầu từ câu ${resumeOrd + 1}).`, 'info');
         }
 
         function openLoginModal() {
@@ -1462,11 +1448,9 @@ function doGet(e) {
             document.getElementById('ord-grammar-tag').textContent = q.unit;
             document.getElementById('ord-question-select').value = ordIndex;
             
-            // Đồng bộ dropdown chọn bài (mỗi 10 câu 1 bài)
             const unitBucket = Math.floor(ordIndex / 10);
             document.getElementById('ord-unit-select').value = String(unitBucket);
 
-            // Reset input & feedback
             const inputEl = document.getElementById('ord-user-input');
             const activeStudent = studentsData[currentStudentId];
             if (activeStudent) {
@@ -1478,7 +1462,6 @@ function doGet(e) {
             inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition';
             document.getElementById('ord-feedback').classList.add('hidden');
 
-            // Trạng thái đã làm
             const student = studentsData[currentStudentId];
             const savedRecord = student?.ordering?.[q.id];
             const statusPill = document.getElementById('ord-status-pill');
@@ -1509,15 +1492,18 @@ function doGet(e) {
             const counter = document.getElementById('ord-hint-counter');
             if (counter) counter.textContent = `${freeRemaining} lượt miễn phí còn lại · sau đó ${PINYIN_HINT_COST} xu/lượt · Ví: ${coins} xu`;
 
-            wordBank.innerHTML = ordShuffledWords.map((word) => {
+            wordBank.innerHTML = ordShuffledWords.map((word, idx) => {
                 const isRevealed = revealedForQuestion.includes(word.key);
+                const sep = idx < ordShuffledWords.length - 1
+                    ? `<span class="text-orange-300 font-bold text-lg select-none">/</span>`
+                    : '';
                 return `
                     <div class="word-chip px-3.5 py-2.5 rounded-xl border border-orange-200 bg-white text-slate-800 shadow-2xs flex flex-col items-center justify-center min-w-[78px]">
                         <span class="chinese-text text-lg sm:text-xl font-bold leading-snug">${escapeHtml(word.hanzi)}</span>
                         ${isRevealed
                             ? `<span class="mt-1 text-[11px] font-semibold text-brand-teal">${escapeHtml(word.pinyin)}</span>`
                             : `<button type="button" onclick="revealOrderingPinyin(${word.key})" class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md px-2 py-1">Hiện Pinyin</button>`}
-                    </div>`;
+                    </div>${sep}`;
             }).join('');
         }
 
@@ -1578,13 +1564,13 @@ function doGet(e) {
                 const tChar = targetChars[i];
                 const uChar = userChars[i];
                 if (uChar === tChar) {
-                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300">${uChar}</span>`;
+                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300">${escapeHtml(uChar)}</span>`;
                 } else if (uChar && !tChar) {
-                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-rose-100 text-rose-700 line-through border border-rose-300" title="Thừa ký tự">${uChar}</span>`;
+                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-rose-100 text-rose-700 line-through border border-rose-300" title="Thừa ký tự">${escapeHtml(uChar)}</span>`;
                 } else if (!uChar && tChar) {
                     diffHtml += `<span class="px-2 py-1 rounded-lg bg-amber-100 text-amber-700 border border-dashed border-amber-400" title="Thiếu ký tự">_</span>`;
                 } else {
-                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-rose-100 text-rose-700 border border-rose-300" title="Sai (Đúng là: ${tChar})">${uChar}</span>`;
+                    diffHtml += `<span class="px-2 py-1 rounded-lg bg-rose-100 text-rose-700 border border-rose-300" title="Sai (Đúng là: ${escapeHtml(tChar)})">${escapeHtml(uChar)}</span>`;
                 }
             }
             return diffHtml;
@@ -1607,7 +1593,6 @@ function doGet(e) {
             let coinsAwarded = false;
             let alreadyCorrect = false;
 
-            // Lưu tiến độ; chỉ cộng 100 xu ở lần đầu trả lời đúng câu này.
             if (currentStudentId && studentsData[currentStudentId]) {
                 const student = studentsData[currentStudentId];
                 const previous = student.ordering[q.id];
@@ -1622,7 +1607,9 @@ function doGet(e) {
                     firstCorrectAt: previous?.firstCorrectAt || (isCorrect ? new Date().toISOString() : null)
                 };
                 student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
-                if (isCorrect) student.progress.orderingIndex = Math.min(ordIndex + 1, ORDERING_QUESTIONS.length - 1);
+                if (isCorrect) {
+                    student.progress.orderingIndex = Math.min(ordIndex + 1, ORDERING_QUESTIONS.length - 1);
+                }
                 saveToLocalStorage();
                 const hintsUsed = Number(student.hintsUsed || 0);
                 const freeRemaining = Math.max(0, FREE_PINYIN_HINTS - hintsUsed);
@@ -1630,7 +1617,6 @@ function doGet(e) {
                 if (counter) counter.textContent = `${freeRemaining} lượt miễn phí còn lại · sau đó ${PINYIN_HINT_COST} xu/lượt · Ví: ${Number(student.coins || 0)} xu`;
             }
 
-            // Hiển thị đối chiếu từng chữ Hán
             document.getElementById('ord-char-diff').innerHTML = buildCharacterDiffHtml(cleanUser, cleanTarget);
 
             const feedbackEl = document.getElementById('ord-feedback');
@@ -1770,16 +1756,6 @@ function doGet(e) {
                 .trim();
         }
 
-        function normalizePinyin(str) {
-            return String(str || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/ü/g, 'u')
-                .replace(/[0-5]/g, '')
-                .replace(/[^a-z]/g, '');
-        }
-
         function checkDictationAnswer() {
             const q = DICTATION_QUESTIONS[dicIndex];
             const rawInput = document.getElementById('dic-user-input').value;
@@ -1842,10 +1818,9 @@ function doGet(e) {
         }
 
         // =========================================================================
-        // 8. PHẦN 3: BẢNG TỔNG KẾT & TẠO MÃ NỘP BÀI (BASE64 SYNC TOKEN)
+        // 8. PHẦN 3: BẢNG TỔNG KẾT & TẠO MÃ NỘP BÀI (ẨN CÂU HỎI & ĐÁP ÁN)
         // =========================================================================
         function generateSubmissionToken(student) {
-            // Nén dữ liệu gọn nhẹ: lưu danh sách index câu đúng (1..100) và câu sai (1..100)
             const ordRight = [];
             const ordWrong = [];
             ORDERING_QUESTIONS.forEach((q, idx) => {
@@ -1880,7 +1855,6 @@ function doGet(e) {
             };
 
             const jsonStr = JSON.stringify(payload);
-            // Encode UTF-8 sang Base64 an toàn
             const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
             return 'HSK1_' + base64;
         }
@@ -1956,7 +1930,6 @@ function doGet(e) {
             document.getElementById('sum-coins').textContent = Number(student.coins || 0).toLocaleString('vi-VN');
             document.getElementById('sum-total-done').textContent = `Đạt chuẩn ${totalCorrect}/${totalAll} câu toàn khóa`;
 
-            // Cập nhật Mã Nộp Bài
             document.getElementById('student-token-display').value = generateSubmissionToken(student);
 
             const rankEl = document.getElementById('sum-rank');
@@ -1974,12 +1947,17 @@ function doGet(e) {
                 rankEl.className = 'text-xl font-extrabold text-slate-600 mt-1';
             }
 
-            // Ẩn toàn bộ câu hỏi, câu trả lời và đáp án ở trang kết quả.
-            // Chỉ hiển thị số liệu tổng hợp; giáo viên xem chi tiết trong Góc Giáo Viên.
+            // Ẩn toàn bộ danh sách câu hỏi và đáp án ở trang kết quả
             const ordListEl = document.getElementById('sum-ord-list');
             const dicListEl = document.getElementById('sum-dic-list');
-            if (ordListEl) ordListEl.textContent = 'Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
-            if (dicListEl) dicListEl.textContent = 'Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
+            if (ordListEl) {
+                ordListEl.innerHTML = '';
+                ordListEl.classList.add('hidden');
+            }
+            if (dicListEl) {
+                dicListEl.innerHTML = '';
+                dicListEl.classList.add('hidden');
+            }
         }
 
         function copyTextFallback(text) {
@@ -2073,7 +2051,8 @@ function doGet(e) {
             if (currentStudentId && studentsData[currentStudentId]) {
                 studentsData[currentStudentId].ordering = {};
                 studentsData[currentStudentId].dictation = {};
-                // Giữ nguyên số xu, số lượt gợi ý đã dùng và Pinyin đã mở để không làm mới ưu đãi 5 lượt miễn phí.
+                studentsData[currentStudentId].progress = { orderingIndex: 0, dictationIndex: 0 };
+                studentsData[currentStudentId].drafts = { ordering: {}, dictation: {} };
                 saveToLocalStorage();
                 initOrderingQuestion(0);
                 initDictationQuestion(0);
@@ -2082,7 +2061,7 @@ function doGet(e) {
         }
 
         // =========================================================================
-        // 9. GÓC GIÁO VIÊN (TEACHER DASHBOARD) - QUẢN LÝ & TỔNG HỢP LỚP HỌC
+        // 9. GÓC GIÁO VIÊN (TEACHER DASHBOARD)
         // =========================================================================
         async function unlockTeacherDashboard(e) {
             e.preventDefault();
@@ -2122,7 +2101,6 @@ function doGet(e) {
                 return;
             }
 
-            // Tách các token theo khoảng trắng hoặc xuống dòng
             const tokens = raw.split(/[\s\n\r]+/).filter(t => t.startsWith('HSK1_'));
             if (tokens.length === 0) {
                 showToast('Không tìm thấy mã hợp lệ bắt đầu bằng "HSK1_".', 'error');
@@ -2161,7 +2139,6 @@ function doGet(e) {
                     try {
                         const text = e.target.result;
                         const lines = text.split(/\r?\n/).filter(l => l.trim());
-                        // Dòng 2 chứa thông tin tổng hợp: "Tên","Thời gian",ord/100,dic/100,...
                         if (lines.length >= 2) {
                             const cols = lines[1].split(',');
                             const stuName = (cols[0] || file.name).replace(/^"|"$/g, '');
@@ -2169,7 +2146,6 @@ function doGet(e) {
                             const ordering = {};
                             const dictation = {};
 
-                            // Đọc chi tiết từng dòng bên dưới
                             for (let i = 4; i < lines.length; i++) {
                                 const row = lines[i].split(',');
                                 if (row.length >= 4) {
@@ -2240,7 +2216,6 @@ function doGet(e) {
         }
 
         function getCombinedClassList() {
-            // Cloud records are authoritative; local/imported records fill in any entries not yet synced.
             const map = {};
             Object.values(teacherImportedData).forEach(st => { if (st?.id) map[st.id] = st; });
             Object.values(studentsData).forEach(st => { if (st?.id) map[st.id] = st; });
@@ -2297,7 +2272,7 @@ function doGet(e) {
                             <td class="py-3 px-4 text-center">${statusBadge}</td>
                             <td class="py-3 px-4 text-xs text-slate-500">${escapeHtml(s.updatedAt || '')}</td>
                             <td class="py-3 px-4 text-right">
-                                <button onclick="openTeacherStudentDetail('${s.id}')"
+                                <button onclick="openTeacherStudentDetail('${escapeHtml(s.id)}')"
                                     class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
                                     Chi tiết
                                 </button>
@@ -2307,7 +2282,6 @@ function doGet(e) {
                 }).join('');
             }
 
-            // Thống kê Top câu học viên hay làm sai nhất
             const mistakeMap = {};
             roster.forEach(s => {
                 ORDERING_QUESTIONS.forEach((q, i) => {
@@ -2368,7 +2342,7 @@ function doGet(e) {
                     <div class="space-y-1.5 max-h-40 overflow-y-auto">
                         ${wrongOrd.map(item => `
                             <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs flex justify-between">
-                                <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${item.q.answer}</span></span>
+                                <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${escapeHtml(item.q.answer)}</span></span>
                                 <span class="text-rose-600 chinese-text">Gõ: ${escapeHtml(item.rec.userAnswer)}</span>
                             </div>
                         `).join('')}
@@ -2382,7 +2356,7 @@ function doGet(e) {
                     <div class="space-y-1.5 max-h-40 overflow-y-auto">
                         ${wrongDic.map(item => `
                             <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs flex justify-between">
-                                <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${item.q.hanzi}</span></span>
+                                <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${escapeHtml(item.q.hanzi)}</span></span>
                                 <span class="text-rose-600 chinese-text">Gõ: ${escapeHtml(item.rec.userInput)}</span>
                             </div>
                         `).join('')}
