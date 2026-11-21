@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSK 1 Master 3.0 with PhAnhhh - Luyện Pinyin, Sắp xếp câu & Nghe chép</title>
+    <title>HSK 1 Master 3.0 with PhAnhhh - Luyện Pinyin, Sắp xếp câu, Nghe chép, Đọc & Nói</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & Noto Sans SC -->
@@ -55,7 +55,6 @@
         .word-chip:active:not(:disabled) {
             transform: translateY(0);
         }
-        /* Sound wave animation */
         @keyframes pulse-ring {
             0% { transform: scale(0.95); opacity: 0.7; }
             70% { transform: scale(1.25); opacity: 0; }
@@ -70,7 +69,15 @@
             z-index: -1;
             animation: pulse-ring 1.4s infinite;
         }
-        /* Custom scrollbar */
+        .recording-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 9999px;
+            background-color: #DC2626;
+            z-index: -1;
+            animation: pulse-ring 1.1s infinite;
+        }
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -86,7 +93,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Toast Notification Container (Replaces alert) -->
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- Student Login / Profile Selection Modal -->
@@ -97,7 +104,7 @@
                     <span class="chinese-text text-3xl font-bold">汉语</span>
                 </div>
                 <h2 class="text-2xl font-bold tracking-tight">HSK 1 Master 3.0 with PhAnhhh</h2>
-                <p class="text-orange-100 text-sm mt-1">Hệ thống luyện Sắp xếp câu & Nghe chép chính tả</p>
+                <p class="text-orange-100 text-sm mt-1">Hệ thống luyện Sắp xếp câu, Nghe chép, Đọc & Nói</p>
             </div>
             
             <div class="p-6">
@@ -106,7 +113,7 @@
                 </label>
                 <form id="new-student-form" class="flex gap-2 mb-5">
                     <input type="text" id="student-name-input" required maxlength="40"
-                        placeholder="Ví dụ: May Pham "
+                        placeholder="Ví dụ: May Pham"
                         class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent text-sm">
                     <button type="submit" 
                         class="bg-brand-red hover:bg-brand-redDark text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
@@ -120,12 +127,12 @@
                         <i class="fa-solid fa-cloud-arrow-up mr-1"></i>Kết nối Google Sheets của lớp (nhập một lần)
                     </label>
                     <div class="flex gap-2">
-                        <input type="url" id="student-webhook-url" placeholder="Dán URL Web App giáo viên gửi..."
+                        <input type="url" id="student-webhook-url" placeholder="Dán URL Web App ở trong nhóm dép lào đã gửi..."
                             class="min-w-0 flex-1 px-3 py-2 text-xs rounded-lg border border-emerald-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         <button type="button" onclick="saveStudentWebhookUrl()"
-                            class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Lưu kết nối</button>
+                            class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">Lưu kết nối</button>
                     </div>
-                    <p class="text-[10px] text-emerald-800 mt-1.5">Sau khi kết nối, bài làm và xu sẽ tự đồng bộ lên bảng tính. Học viên chỉ xem được dữ liệu của mình.</p>
+                    <p class="text-[10px] text-emerald-800 mt-1.5">Sau khi kết nối, bài làm, bản ghi âm và xu sẽ tự đồng bộ lên bảng tính. Học viên chỉ xem được dữ liệu của mình.</p>
                 </div>
 
                 <div id="saved-students-section" class="hidden">
@@ -134,9 +141,7 @@
                         <span class="flex-shrink mx-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Hoặc chọn học viên đã lưu</span>
                         <div class="flex-grow border-t border-slate-200"></div>
                     </div>
-                    <div id="saved-students-list" class="max-h-48 overflow-y-auto space-y-2 pr-1">
-                        <!-- Rendered dynamically -->
-                    </div>
+                    <div id="saved-students-list" class="max-h-48 overflow-y-auto space-y-2 pr-1"></div>
                 </div>
             </div>
         </div>
@@ -157,7 +162,7 @@
             <div class="p-6 space-y-4 text-sm text-slate-600 leading-relaxed">
                 <p class="bg-teal-50 text-teal-800 p-3 rounded-xl border border-teal-200 font-medium">
                     <i class="fa-solid fa-circle-check text-teal-600 mr-1.5"></i>
-                    
+                    Ứng dụng này được thiết kế 100% tĩnh (Single-File HTML), không cần server, chạy miễn phí trọn đời trên GitHub Pages!
                 </p>
                 <ol class="list-decimal list-inside space-y-2.5 font-medium text-slate-700">
                     <li>Lưu toàn bộ mã nguồn trang web này thành một tệp duy nhất tên là <code class="bg-slate-100 text-brand-red px-1.5 py-0.5 rounded font-mono">index.html</code>.</li>
@@ -185,7 +190,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-slate-800 text-base sm:text-lg leading-tight">HSK 1 Master 3.0 with PhAnhhh</h1>
-                    <p class="text-xs text-slate-500 hidden sm:block">Ôn luyện theo đề cương HSK 1 3.0 </p>
+                    <p class="text-xs text-slate-500 hidden sm:block">Ôn luyện toàn diện theo đề cương HSK 3.0 cấp 1</p>
                 </div>
             </div>
 
@@ -201,35 +206,47 @@
             </div>
         </div>
 
-        <!-- 3 Main Navigation Tabs -->
+        <!-- Main Navigation Tabs -->
         <div class="max-w-5xl mx-auto px-4">
-            <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar" aria-label="Tabs">
+            <nav class="flex space-x-1 sm:space-x-1.5 overflow-x-auto no-scrollbar" aria-label="Tabs">
                 <button onclick="switchTab('ordering')" id="tab-btn-ordering"
-                    class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 border-brand-red text-brand-red transition cursor-pointer whitespace-nowrap">
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-brand-red text-brand-red transition cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-puzzle-piece"></i>
                     <span>1. Sắp xếp câu</span>
                     <span id="badge-ordering" class="text-xs bg-brand-redLight text-brand-red px-2 py-0.5 rounded-full font-bold">0/100</span>
                 </button>
                 <button onclick="switchTab('dictation')" id="tab-btn-dictation"
-                    class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-headphones"></i>
-                    <span>2. Luyện nghe chép</span>
+                    <span>2. Nghe chép</span>
                     <span id="badge-dictation" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">0/100</span>
                 </button>
+                <button onclick="switchTab('reading')" id="tab-btn-reading"
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-book-open text-orange-600"></i>
+                    <span>3. Luyện đọc</span>
+                    <span id="badge-reading" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">0/30</span>
+                </button>
+                <button onclick="switchTab('speaking')" id="tab-btn-speaking"
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-microphone-lines text-rose-600"></i>
+                    <span>4. Luyện nói</span>
+                    <span id="badge-speaking" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">0/20</span>
+                </button>
                 <button onclick="switchTab('pronunciation')" id="tab-btn-pronunciation"
-                    class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-volume-high text-brand-teal"></i>
                     <span>Học phát âm</span>
                 </button>
                 <button onclick="switchTab('summary')" id="tab-btn-summary"
-                    class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-chart-pie"></i>
-                    <span>3. Kết quả & Nộp bài</span>
+                    <span>5. Kết quả & Nộp bài</span>
                 </button>
                 <button onclick="switchTab('teacher')" id="tab-btn-teacher"
-                    class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
+                    class="tab-btn flex-none flex items-center justify-center gap-1.5 px-3.5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition cursor-pointer whitespace-nowrap">
                     <i class="fa-solid fa-chalkboard-user text-amber-600"></i>
-                    <span>4. Góc Giáo Viên</span>
+                    <span>6. Góc Giáo Viên</span>
                 </button>
             </nav>
         </div>
@@ -238,9 +255,8 @@
     <!-- Main Content Workspace -->
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
 
-        <!-- ==================== TAB 1: SENTENCE ORDERING (100 QUESTIONS - TYPING MODE) ==================== -->
+        <!-- ==================== TAB 1: SENTENCE ORDERING (100 QUESTIONS) ==================== -->
         <section id="section-ordering" class="space-y-5">
-            <!-- Unit Filter & Top Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5 flex-wrap">
@@ -253,7 +269,6 @@
                     </div>
 
                     <div class="flex items-center gap-3 flex-wrap">
-                        <!-- Lesson Unit Filter -->
                         <select id="ord-unit-select" onchange="filterOrderingByUnit(this.value)"
                             class="text-xs font-semibold bg-orange-50 border border-orange-200 rounded-xl px-2.5 py-1.5 text-brand-red focus:outline-none focus:ring-2 focus:ring-brand-red">
                             <option value="all">Tất cả 100 câu</option>
@@ -269,7 +284,6 @@
                             <option value="9">Bài 10 (Câu 91 - 100)</option>
                         </select>
 
-                        <!-- Question Selector Dropdown -->
                         <select id="ord-question-select" onchange="jumpToOrdering(this.value)"
                             class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red max-w-[190px]">
                         </select>
@@ -277,7 +291,6 @@
                 </div>
             </div>
 
-            <!-- Question Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <p class="text-sm font-medium text-slate-600">
@@ -287,18 +300,14 @@
                     <span id="ord-status-pill" class="hidden text-xs font-bold px-2.5 py-1 rounded-full"></span>
                 </div>
 
-                <!-- Scrambled Word Bank Display -->
                 <div class="mb-5 p-4 rounded-2xl bg-orange-50/50 border border-orange-200/80">
                     <div class="flex items-center justify-between mb-2.5">
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Các từ Hán tự bị xáo trộn:</span>
                         <span id="ord-hint-counter" class="text-[11px] font-semibold text-amber-700">5 lượt Pinyin đầu tiên miễn phí (toàn tài khoản) · sau đó 500 xu/lượt</span>
                     </div>
-                    <div id="ord-word-bank" class="flex flex-wrap gap-2.5">
-                        <!-- Scrambled Word chips injected by JS -->
-                    </div>
+                    <div id="ord-word-bank" class="flex flex-wrap gap-2.5"></div>
                 </div>
 
-                <!-- Typing Input Area -->
                 <div class="mb-6">
                     <label for="ord-user-input" class="block text-sm font-bold text-slate-700 mb-2">
                         Tự gõ lại câu bằng chữ Hán:
@@ -307,11 +316,10 @@
                         placeholder="Ví dụ: 我是学生"
                         class="w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition">
                     <p class="text-xs text-slate-400 mt-1.5">
-                        * Mẹo: Tự gõ chữ Hán bằng bàn phím tiếng Trung, không bấm vào các thẻ từ. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh. Hệ thống tự bỏ qua dấu câu và khoảng trắng.
+                        * Mẹo: Tự gõ chữ Hán bằng bàn phím tiếng Trung, không bấm vào các thẻ từ. Nhấn <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600 font-mono">Enter</kbd> để kiểm tra nhanh.
                     </p>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-2">
                         <button onclick="resetCurrentOrdering()" id="ord-reset-btn"
@@ -339,25 +347,21 @@
                     </button>
                 </div>
 
-                <!-- Feedback & Character Diff Box -->
                 <div id="ord-feedback" class="hidden mt-6 p-5 rounded-2xl border transition-all">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1">
                             <h4 id="ord-feedback-title" class="font-bold text-base flex items-center gap-2"></h4>
-                            
-                            <!-- Character-by-character comparison for Ordering -->
                             <div id="ord-char-diff-wrapper" class="mt-3 p-3 bg-white rounded-xl border border-slate-200">
                                 <div class="text-[11px] font-semibold text-slate-400 uppercase mb-1">Đối chiếu chữ Hán bạn gõ:</div>
                                 <div id="ord-char-diff" class="text-xl chinese-text tracking-widest font-bold flex flex-wrap gap-1"></div>
                             </div>
-
                             <div class="mt-3 space-y-1">
                                 <p class="text-lg font-bold chinese-text text-slate-900" id="ord-correct-hanzi"></p>
                                 <p class="text-sm font-medium text-brand-teal" id="ord-correct-pinyin"></p>
                                 <p class="text-sm text-slate-600" id="ord-correct-meaning"></p>
                             </div>
                         </div>
-                        <button onclick="speakCurrentOrdering()" title="Luyện phát âm"
+                        <button onclick="speakCurrentOrdering()" title="Nghe phát âm chuẩn"
                             class="w-11 h-11 rounded-full bg-brand-teal text-white hover:bg-teal-800 flex items-center justify-center shadow-md shrink-0 cursor-pointer transition">
                             <i class="fa-solid fa-volume-high"></i>
                         </button>
@@ -372,7 +376,6 @@
 
         <!-- ==================== TAB 2: LISTENING DICTATION (100 QUESTIONS) ==================== -->
         <section id="section-dictation" class="hidden space-y-5">
-            <!-- Top Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 flex-wrap">
                     <span class="bg-brand-tealLight text-brand-teal font-bold px-3 py-1.5 rounded-xl text-sm">
@@ -384,7 +387,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap">
-                    <!-- Lesson Unit Filter for Dictation -->
                     <select id="dic-unit-select" onchange="filterDictationByUnit(this.value)"
                         class="text-xs font-semibold bg-teal-50 border border-teal-200 rounded-xl px-2.5 py-1.5 text-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal">
                         <option value="all">Tất cả 100 câu</option>
@@ -406,23 +408,19 @@
                 </div>
             </div>
 
-            <!-- Dictation Workspace Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7">
-                <!-- Audio Player Controls -->
                 <div class="bg-gradient-to-br from-teal-50 to-emerald-50/60 border border-teal-200/80 rounded-2xl p-6 text-center mb-6">
                     <p class="text-xs font-bold uppercase tracking-wider text-brand-teal mb-3">
-                        <i class="fa-solid fa-ear-listen mr-1"></i> Nghe câu tiếng Trung và gõ lại chữ Hán 
+                        <i class="fa-solid fa-ear-listen mr-1"></i> Nghe câu tiếng Trung và gõ lại chữ Hán (Phím tắt: Alt + R để nghe lại)
                     </p>
                     
                     <div class="flex flex-wrap items-center justify-center gap-4">
-                        <!-- Play Normal Speed -->
                         <button onclick="playDictationAudio(1.0)" id="btn-play-normal"
                             class="relative px-6 py-3.5 rounded-2xl bg-brand-teal hover:bg-teal-800 text-white font-bold text-sm shadow-md transition flex items-center gap-2.5 cursor-pointer">
                             <i class="fa-solid fa-volume-high text-lg"></i>
                             <span>Nghe chuẩn (1.0x)</span>
                         </button>
 
-                        <!-- Play Slow Speed -->
                         <button onclick="playDictationAudio(0.65)" id="btn-play-slow"
                             class="px-5 py-3.5 rounded-2xl bg-white hover:bg-teal-50 text-brand-teal border border-teal-300 font-bold text-sm shadow-xs transition flex items-center gap-2 cursor-pointer">
                             <i class="fa-solid fa-gauge-simple-low"></i>
@@ -435,7 +433,6 @@
                     </p>
                 </div>
 
-                <!-- Input Area -->
                 <div class="mb-5">
                     <div class="flex items-center justify-between mb-2">
                         <label for="dic-user-input" class="text-sm font-bold text-slate-700">
@@ -447,7 +444,6 @@
                         </button>
                     </div>
 
-                    <!-- Optional Pinyin Hint Box -->
                     <div id="dic-hint-box" class="hidden mb-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-sm text-amber-900 font-medium">
                         <span class="font-bold">Gợi ý Pinyin:</span> <span id="dic-hint-text"></span>
                     </div>
@@ -460,7 +456,6 @@
                     </p>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-2">
                         <button onclick="clearDictationInput()"
@@ -484,19 +479,14 @@
                     </button>
                 </div>
 
-                <!-- Character Diff & Result Feedback -->
                 <div id="dic-feedback" class="hidden mt-6 p-5 rounded-2xl border transition-all">
                     <h4 id="dic-feedback-title" class="font-bold text-base flex items-center gap-2 mb-3"></h4>
-                    
-                    <!-- Character by character comparison -->
                     <div class="mb-4 p-3.5 bg-white rounded-xl border border-slate-200">
                         <div class="text-xs font-semibold text-slate-400 uppercase mb-1.5">So sánh từng ký tự bạn gõ:</div>
                         <div id="dic-char-diff" class="text-2xl chinese-text tracking-widest font-bold flex flex-wrap gap-1"></div>
                     </div>
-
-                    <!-- Standard Reference Answer -->
                     <div class="space-y-1 bg-white/70 p-3.5 rounded-xl border border-slate-200/80">
-                        <div class="text-xs font-semibold text-slate-400 uppercase">Đáp án chuẩn HSK 1 3.0:</div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase">Đáp án chuẩn HSK 3.0 cấp 1:</div>
                         <p class="text-xl font-bold chinese-text text-slate-900" id="dic-correct-hanzi"></p>
                         <p class="text-sm font-medium text-brand-teal" id="dic-correct-pinyin"></p>
                         <p class="text-sm text-slate-600" id="dic-correct-meaning"></p>
@@ -506,9 +496,306 @@
             </div>
         </section>
 
-        <!-- ==================== TAB 3: COURSE SUMMARY & STUDENT SUBMISSION ==================== -->
+        <!-- ==================== TAB 3: READING PRACTICE (ĐỌC CÂU & ĐỌC ĐOẠN VĂN - GHI ÂM) ==================== -->
+        <section id="section-reading" class="hidden space-y-5">
+            <!-- Mode Switcher & Topic Filter -->
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <!-- Sub-mode pills: Đọc câu vs Đọc đoạn văn -->
+                    <div class="inline-flex rounded-xl bg-orange-50/80 border border-orange-200 p-1 text-xs sm:text-sm font-bold">
+                        <button type="button" onclick="switchReadingSubMode('sentences')" id="read-sub-sentences"
+                            class="px-3.5 py-2 rounded-lg bg-brand-red text-white shadow-2xs transition cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-align-left"></i>
+                            <span>Phần 1: Đọc câu</span>
+                            <span id="read-sent-count-pill" class="text-[11px] bg-white/20 px-1.5 py-0.5 rounded-full">0/20</span>
+                        </button>
+                        <button type="button" onclick="switchReadingSubMode('passages')" id="read-sub-passages"
+                            class="px-3.5 py-2 rounded-lg text-slate-600 hover:text-brand-red transition cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span>Phần 2: Đọc đoạn văn</span>
+                            <span id="read-pass-count-pill" class="text-[11px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded-full">0/10</span>
+                        </button>
+                    </div>
+
+                    <!-- Topic & Item Select -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="read-topic-select" onchange="filterReadingByTopic(this.value)"
+                            class="text-xs font-semibold bg-orange-50 border border-orange-200 rounded-xl px-2.5 py-1.5 text-brand-red focus:outline-none focus:ring-2 focus:ring-brand-red">
+                        </select>
+                        <select id="read-item-select" onchange="jumpToReadingItem(this.value)"
+                            class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red max-w-[200px]">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Workspace Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span id="read-item-badge" class="bg-brand-redLight text-brand-red font-bold px-3 py-1 rounded-xl text-xs sm:text-sm">
+                            Câu đọc 1 / 20
+                        </span>
+                        <span id="read-item-topic" class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">
+                            Chủ đề 1: Chào hỏi & Làm quen
+                        </span>
+                    </div>
+                    <span id="read-recorded-status" class="hidden text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                        <i class="fa-solid fa-circle-check mr-1"></i>Đã ghi âm nộp bài
+                    </span>
+                </div>
+
+                <!-- Chinese Text Display Box -->
+                <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-orange-50/70 to-amber-50/50 border border-orange-200/80 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                            <i class="fa-solid fa-eye text-brand-red mr-1"></i>Đọc thành tiếng văn bản tiếng Trung sau:
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="toggleReadingPinyin()" id="read-toggle-pinyin-btn"
+                                class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-amber-200 text-amber-700 hover:bg-amber-50 cursor-pointer">
+                                <i class="fa-regular fa-eye mr-1"></i>Hiện Pinyin & Nghĩa
+                            </button>
+                            <button type="button" onclick="speakReadingText(1.0)"
+                                class="text-xs font-bold px-3 py-1 rounded-lg bg-brand-teal hover:bg-teal-800 text-white cursor-pointer flex items-center gap-1">
+                                <i class="fa-solid fa-volume-high"></i><span>Nghe mẫu</span>
+                            </button>
+                            <button type="button" onclick="speakReadingText(0.65)"
+                                class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-teal-50 text-brand-teal border border-teal-200 cursor-pointer">
+                                0.65x
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="read-hanzi-display" class="chinese-text text-2xl sm:text-3xl font-bold text-slate-900 leading-relaxed pt-1">
+                    </div>
+
+                    <div id="read-support-box" class="hidden pt-3 border-t border-orange-200/70 space-y-1">
+                        <p id="read-pinyin-display" class="text-sm sm:text-base font-semibold text-brand-teal"></p>
+                        <p id="read-meaning-display" class="text-xs sm:text-sm text-slate-600"></p>
+                    </div>
+                </div>
+
+                <!-- Voice Recorder Studio for Reading -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-microphone text-rose-600"></i>
+                                Phòng thu luyện đọc (Tự nghe lại & Gửi giáo viên chấm)
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Nhấn <strong>Bắt đầu ghi âm</strong>, đọc rõ ràng từng thanh điệu, sau đó nhấn <strong>Dừng</strong> để nghe lại.</p>
+                        </div>
+                        <span id="read-rec-timer" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600">
+                            00:00
+                        </span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" onclick="toggleRecording('reading')" id="read-rec-btn"
+                            class="relative px-5 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition cursor-pointer flex items-center gap-2">
+                            <i class="fa-solid fa-microphone"></i>
+                            <span>Bắt đầu ghi âm</span>
+                        </button>
+
+                        <button type="button" onclick="deleteCurrentRecording('reading')" id="read-del-rec-btn"
+                            class="hidden px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition cursor-pointer">
+                            <i class="fa-solid fa-trash-can mr-1"></i>Xóa bản thu này
+                        </button>
+                    </div>
+
+                    <!-- Playback Container -->
+                    <div id="read-audio-player-wrap" class="hidden p-3.5 rounded-xl bg-white border border-emerald-200 space-y-2.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-emerald-700"><i class="fa-solid fa-headphones mr-1"></i>Bản ghi âm của bạn:</span>
+                            <span id="read-audio-meta" class="text-slate-400"></span>
+                        </div>
+                        <audio id="read-audio-player" controls class="w-full h-10"></audio>
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <span class="text-[11px] text-slate-500">Bản ghi đã lưu tự động vào hồ sơ & đồng bộ Google Sheets (nếu đã kết nối).</span>
+                            <a id="read-audio-download" download="luyen-doc-hsk1.webm"
+                                class="text-xs font-semibold text-brand-teal hover:underline cursor-pointer">
+                                <i class="fa-solid fa-download mr-1"></i>Tải file âm thanh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                    <button type="button" onclick="prevReadingItem()"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                        <i class="fa-solid fa-chevron-left mr-1.5"></i>Bài trước
+                    </button>
+                    <button type="button" onclick="nextReadingItem()"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-red hover:bg-brand-redDark transition cursor-pointer">
+                        Bài tiếp theo<i class="fa-solid fa-chevron-right ml-1.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: SPEAKING PRACTICE (CÂU HỎI TRẢ LỜI RIÊNG - GHI ÂM) ==================== -->
+        <section id="section-speaking" class="hidden space-y-5">
+            <!-- Control Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <span class="bg-rose-50 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-xl text-sm">
+                        Câu hỏi nói <span id="spk-current-num">1</span> / <span id="spk-total-num">20</span>
+                    </span>
+                    <span id="spk-topic-tag" class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">
+                        Chủ đề 1: Chào hỏi & Giới thiệu bản thân
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <select id="spk-topic-select" onchange="filterSpeakingByTopic(this.value)"
+                        class="text-xs font-semibold bg-rose-50 border border-rose-200 rounded-xl px-2.5 py-1.5 text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                        <option value="all">Tất cả 10 chủ đề HSK 1 (3.0)</option>
+                        <option value="0">Chủ đề 1: Chào hỏi & Tên tuổi</option>
+                        <option value="1">Chủ đề 2: Gia đình & Người thân</option>
+                        <option value="2">Chủ đề 3: Học tập & Ngôn ngữ</option>
+                        <option value="3">Chủ đề 4: Thời gian & Lịch trình</option>
+                        <option value="4">Chủ đề 5: Ăn uống & Sở thích</option>
+                        <option value="5">Chủ đề 6: Giải trí & Hoạt động</option>
+                        <option value="6">Chủ đề 7: Mua sắm & Giá cả</option>
+                        <option value="7">Chủ đề 8: Thời tiết & Sức khỏe</option>
+                        <option value="8">Chủ đề 9: Phương tiện & Địa điểm</option>
+                        <option value="9">Chủ đề 10: Giao tiếp hằng ngày</option>
+                    </select>
+
+                    <select id="spk-question-select" onchange="jumpToSpeaking(this.value)"
+                        class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500 max-w-[200px]">
+                    </select>
+                </div>
+            </div>
+
+            <!-- Speaking Workspace Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-7 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-sm font-medium text-slate-600">
+                        <i class="fa-solid fa-comments text-rose-600 mr-1.5"></i>
+                        Nghe câu hỏi của giáo viên và <strong>tự trả lời bằng tiếng Trung</strong> theo thông tin thực tế của bạn:
+                    </p>
+                    <span id="spk-recorded-status" class="hidden text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                        <i class="fa-solid fa-circle-check mr-1"></i>Đã ghi âm trả lời
+                    </span>
+                </div>
+
+                <!-- Teacher Prompt Question Card -->
+                <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-rose-50/70 via-orange-50/50 to-amber-50/50 border border-rose-200/80 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-rose-700">
+                            <i class="fa-solid fa-chalkboard-user mr-1"></i>Câu hỏi luyện nói:
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="toggleSpeakingHint()" id="spk-hint-btn"
+                                class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-amber-200 text-amber-700 hover:bg-amber-50 cursor-pointer">
+                                <i class="fa-regular fa-lightbulb mr-1"></i>Gợi ý cấu trúc trả lời
+                            </button>
+                            <button type="button" onclick="speakSpeakingQuestion(1.0)"
+                                class="text-xs font-bold px-3 py-1 rounded-lg bg-brand-teal hover:bg-teal-800 text-white cursor-pointer flex items-center gap-1">
+                                <i class="fa-solid fa-volume-high"></i><span>Nghe câu hỏi</span>
+                            </button>
+                            <button type="button" onclick="speakSpeakingQuestion(0.65)"
+                                class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white hover:bg-teal-50 text-brand-teal border border-teal-200 cursor-pointer">
+                                0.65x
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="spk-question-hanzi" class="chinese-text text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">
+                    </div>
+                    <p id="spk-question-pinyin" class="text-sm sm:text-base font-semibold text-brand-teal"></p>
+                    <p id="spk-question-meaning" class="text-xs sm:text-sm text-slate-600"></p>
+
+                    <!-- Collapsible Sample Answer / Vocabulary Hint -->
+                    <div id="spk-hint-box" class="hidden mt-3 p-4 rounded-xl bg-white/90 border border-amber-200 space-y-2">
+                        <div class="text-xs font-bold uppercase text-amber-800">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Gợi ý mẫu câu trả lời chuẩn HSK 1 (3.0):
+                        </div>
+                        <p id="spk-sample-hanzi" class="chinese-text text-lg font-bold text-slate-800"></p>
+                        <p id="spk-sample-pinyin" class="text-xs sm:text-sm font-medium text-brand-teal"></p>
+                        <p id="spk-sample-meaning" class="text-xs text-slate-600"></p>
+                        <div class="pt-1 flex items-center gap-2">
+                            <button type="button" onclick="speakSpeakingSample()"
+                                class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-teal-50 text-brand-teal border border-teal-200 hover:bg-teal-100 cursor-pointer">
+                                <i class="fa-solid fa-volume-low mr-1"></i>Nghe câu mẫu
+                            </button>
+                            <span id="spk-vocab-tips" class="text-[11px] text-slate-500"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional Note / Draft Script -->
+                <div>
+                    <label for="spk-user-note" class="block text-xs font-bold text-slate-600 mb-1.5">
+                        Ghi chú ý chính câu trả lời của bạn (không bắt buộc — gửi kèm giáo viên xem):
+                    </label>
+                    <input type="text" id="spk-user-note" placeholder="Ví dụ: 我叫明英，我是越南人，今年二十岁。"
+                        class="w-full px-3.5 py-2.5 text-sm chinese-text rounded-xl border border-slate-300 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10">
+                </div>
+
+                <!-- Voice Recorder Studio for Speaking -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-microphone-lines text-rose-600"></i>
+                                Ghi âm câu trả lời của bạn
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-0.5">Hãy trả lời trọn câu bằng tiếng Trung (khuyến khích nói 2–4 câu theo gợi ý).</p>
+                        </div>
+                        <span id="spk-rec-timer" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600">
+                            00:00
+                        </span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" onclick="toggleRecording('speaking')" id="spk-rec-btn"
+                            class="relative px-5 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition cursor-pointer flex items-center gap-2">
+                            <i class="fa-solid fa-microphone"></i>
+                            <span>Bắt đầu ghi âm trả lời</span>
+                        </button>
+
+                        <button type="button" onclick="deleteCurrentRecording('speaking')" id="spk-del-rec-btn"
+                            class="hidden px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition cursor-pointer">
+                            <i class="fa-solid fa-trash-can mr-1"></i>Xóa bản thu này
+                        </button>
+                    </div>
+
+                    <div id="spk-audio-player-wrap" class="hidden p-3.5 rounded-xl bg-white border border-emerald-200 space-y-2.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-emerald-700"><i class="fa-solid fa-headphones mr-1"></i>Câu trả lời đã ghi âm:</span>
+                            <span id="spk-audio-meta" class="text-slate-400"></span>
+                        </div>
+                        <audio id="spk-audio-player" controls class="w-full h-10"></audio>
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <span class="text-[11px] text-slate-500">Đã lưu vào hồ sơ luyện nói & sẵn sàng để giáo viên nghe chấm bài.</span>
+                            <a id="spk-audio-download" download="luyen-noi-hsk1.webm"
+                                class="text-xs font-semibold text-brand-teal hover:underline cursor-pointer">
+                                <i class="fa-solid fa-download mr-1"></i>Tải file âm thanh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                    <button type="button" onclick="prevSpeaking()"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+                        <i class="fa-solid fa-chevron-left mr-1.5"></i>Câu trước
+                    </button>
+                    <button type="button" onclick="nextSpeaking()"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 transition cursor-pointer">
+                        Câu tiếp theo<i class="fa-solid fa-chevron-right ml-1.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: COURSE SUMMARY & STUDENT SUBMISSION ==================== -->
         <section id="section-summary" class="hidden space-y-6">
-            <!-- Header Banner -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-brand-red bg-brand-redLight px-2.5 py-1 rounded-lg">Báo cáo học tập cá nhân</span>
@@ -535,7 +822,6 @@
                 </div>
             </div>
 
-            <!-- Student Submission Token Box -->
             <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
                     <div>
@@ -544,7 +830,7 @@
                             Mã Nộp Bài dành cho Giáo Viên (Sync Code)
                         </h3>
                         <p class="text-xs text-amber-800/80 mt-0.5">
-                            Sau khi làm bài xong, hãy bấm <strong>"Sao chép Mã Nộp Bài"</strong> và gửi qua Dép Lào cho cô để tổng hợp điểm vào bảng lớp học.
+                            Sau khi làm bài xong, hãy bấm <strong>"Sao chép Mã Nộp Bài"</strong> và gửi qua dép lào cho cô để tổng hợp điểm. Nếu lớp đã kết nối Google Sheets, bài làm và bản ghi âm cũng được gửi trực tuyến tự động.
                         </p>
                     </div>
                     <button id="btn-send-webhook" onclick="sendToTeacherWebhook()"
@@ -556,12 +842,11 @@
                     class="w-full p-2.5 text-xs font-mono bg-white border border-amber-300 rounded-xl text-slate-600 focus:outline-none"></textarea>
             </div>
 
-            <!-- 4 KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- Ordering Score -->
+            <!-- KPI Cards (6 cards covering all skills) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
-                        <span>Sắp xếp câu</span>
+                        <span>1. Sắp xếp câu</span>
                         <i class="fa-solid fa-puzzle-piece text-brand-red text-base"></i>
                     </div>
                     <div class="text-3xl font-extrabold text-slate-800">
@@ -572,10 +857,9 @@
                     </div>
                 </div>
 
-                <!-- Dictation Score -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
-                        <span>Luyện nghe chép</span>
+                        <span>2. Luyện nghe chép</span>
                         <i class="fa-solid fa-headphones text-brand-teal text-base"></i>
                     </div>
                     <div class="text-3xl font-extrabold text-slate-800">
@@ -586,63 +870,70 @@
                     </div>
                 </div>
 
-                <!-- Overall Accuracy -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
-                        <span>Tỷ lệ hoàn thành</span>
-                        <i class="fa-solid fa-bullseye text-amber-500 text-base"></i>
+                        <span>3. Luyện đọc (Ghi âm)</span>
+                        <i class="fa-solid fa-book-open text-orange-600 text-base"></i>
                     </div>
-                    <div class="text-3xl font-extrabold text-slate-800" id="sum-accuracy">0%</div>
-                    <p class="text-xs text-slate-500 mt-2" id="sum-total-done">Đã làm 0/200 câu</p>
+                    <div class="text-3xl font-extrabold text-slate-800">
+                        <span id="sum-read-done">0</span><span class="text-lg font-medium text-slate-400">/30</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2" id="sum-read-breakdown">Đọc câu: 0/20 • Đoạn văn: 0/10</p>
                 </div>
 
-                <!-- Student Coins -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
+                        <span>4. Luyện nói (Ghi âm)</span>
+                        <i class="fa-solid fa-microphone-lines text-rose-600 text-base"></i>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-800">
+                        <span id="sum-spk-done">0</span><span class="text-lg font-medium text-slate-400">/20</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">Đã ghi âm trả lời</p>
+                </div>
+
                 <div class="bg-white p-5 rounded-2xl border border-amber-200 shadow-xs">
                     <div class="flex items-center justify-between text-amber-700 text-xs font-semibold uppercase mb-2">
-                        <span>Ví xu</span>
+                        <span>Ví xu tích lũy</span>
                         <i class="fa-solid fa-coins text-amber-500 text-base"></i>
                     </div>
                     <div class="text-3xl font-extrabold text-amber-600"><span id="sum-coins">0</span><span class="text-lg font-medium text-slate-400"> xu</span></div>
-                    <p class="text-xs text-slate-500 mt-2">+100 xu cho mỗi câu sắp xếp đúng lần đầu</p>
+                    <p class="text-xs text-slate-500 mt-2">+100 xu mỗi câu sắp xếp đúng lần đầu</p>
                 </div>
 
-                <!-- Course Rank / Evaluation -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase mb-2">
-                        <span>Đánh giá HSK 1</span>
+                        <span>Tổng kết HSK 1 (3.0)</span>
                         <i class="fa-solid fa-award text-purple-600 text-base"></i>
                     </div>
                     <div class="text-xl font-extrabold text-brand-teal mt-1" id="sum-rank">Mới bắt đầu</div>
-                    <p class="text-xs text-slate-500 mt-2">Mục tiêu đạt &ge; 80% để thi HSK 1</p>
+                    <p class="text-xs text-slate-500 mt-2" id="sum-total-done">Hoàn thành 0/250 mục toàn khóa</p>
                 </div>
             </div>
 
-            <!-- Detailed Breakdown Tables -->
+            <!-- Detailed Breakdown -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Ordering Details -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 1: Sắp xếp câu</h3>
-                        <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
+                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 1 & 2: Sắp xếp & Nghe chép</h3>
+                        <span class="text-xs font-semibold text-slate-500">200 câu chuẩn HSK 1</span>
                     </div>
                     <div id="sum-ord-list" class="p-5 text-sm text-slate-500">
                         Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
                     </div>
                 </div>
 
-                <!-- Dictation Details -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 2: Luyện nghe chép</h3>
-                        <span class="text-xs font-semibold text-slate-500">100 câu chuẩn HSK 1</span>
+                        <h3 class="font-bold text-slate-800 text-sm">Chi tiết phần 3 & 4: Bản ghi âm Đọc & Nói</h3>
+                        <span class="text-xs font-semibold text-slate-500">50 bài ghi âm</span>
                     </div>
-                    <div id="sum-dic-list" class="p-5 text-sm text-slate-500">
-                        Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.
+                    <div id="sum-recordings-list" class="p-5 text-sm text-slate-500">
+                        Chưa có bản ghi âm nào. Hãy vào tab <strong>3. Luyện đọc</strong> hoặc <strong>4. Luyện nói</strong> để ghi âm!
                     </div>
                 </div>
             </div>
 
-            <!-- Reset Student Data Danger Zone -->
             <div class="flex justify-end pt-2">
                 <button onclick="confirmResetStudentProgress()"
                     class="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3.5 py-2 rounded-xl transition cursor-pointer">
@@ -651,15 +942,14 @@
             </div>
         </section>
 
-        <!-- ==================== TAB 4: TEACHER DASHBOARD (QUẢN LÝ LỚP HỌC) ==================== -->
+        <!-- ==================== TAB 6: TEACHER DASHBOARD ==================== -->
         <section id="section-teacher" class="hidden space-y-6">
-            <!-- Teacher Lock Screen -->
             <div id="teacher-lock-screen" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 max-w-md mx-auto text-center">
                 <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-2xl">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800"> Dành Cho Giáo Viên</h2>
-                <p class="text-xs text-slate-500 mt-1 mb-5">Nhập mật khẩu đã cấu hình trong Google Apps Script để xem dữ liệu cả lớp, Top 3 và xuất CSV.</p>
+                <h2 class="text-xl font-bold text-slate-800">Góc Quản Lý Dành Cho Giáo Viên</h2>
+                <p class="text-xs text-slate-500 mt-1 mb-5">Nhập mật khẩu đã cấu hình trong Google Apps Script để xem điểm số, nghe bản ghi âm Đọc/Nói của cả lớp và xuất CSV.</p>
                 
                 <form onsubmit="unlockTeacherDashboard(event)" class="space-y-3">
                     <input type="password" id="teacher-pass-input" placeholder="Mật khẩu giáo viên đã cài trong Apps Script"
@@ -669,17 +959,15 @@
                         Mở Bảng Điều Khiển Giáo Viên
                     </button>
                 </form>
-                <p class="text-[11px] text-slate-400 mt-3">Mật khẩu được xác thực ở máy chủ Apps Script.</p>
+                <p class="text-[11px] text-slate-400 mt-3">Mật khẩu được xác thực ở máy chủ Apps Script; không đặt mật khẩu trong file HTML.</p>
             </div>
 
-            <!-- Teacher Unlocked Content -->
             <div id="teacher-workspace" class="hidden space-y-6">
-                <!-- Top Header -->
                 <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-lg">Teacher Dashboard</span>
-                        <h2 class="text-2xl font-bold mt-2">Quản Lý Kết Quả Học Tập Lớp HSK 1 · 3.0</h2>
-                        <p class="text-xs text-slate-300 mt-1">Dữ liệu học viên được đồng bộ tự động lên Google Sheets; chỉ tài khoản giáo viên đã xác thực mới tải được bảng lớp.</p>
+                        <h2 class="text-2xl font-bold mt-2">Quản Lý Kết Quả & Chấm Ghi Âm Lớp HSK 1 · 3.0</h2>
+                        <p class="text-xs text-slate-300 mt-1">Bấm nút <strong>Chi tiết / Nghe ghi âm</strong> ở từng học viên để nghe lại bài Đọc và Nói và chấm điểm.</p>
                     </div>
                     <div class="flex flex-wrap gap-2.5">
                         <button onclick="refreshTeacherCloudData()"
@@ -698,17 +986,15 @@
                     </div>
                 </div>
 
-                <!-- Import Methods Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Method 1: Paste Sync Codes -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-1">
                                 <i class="fa-solid fa-paste text-amber-600"></i>
-                                Cách 1: Dán Mã Nộp Bài của học viên (Hỗ trợ dán nhiều mã cùng lúc)
+                                Cách 1: Dán Mã Nộp Bài của học viên
                             </h3>
                             <p class="text-xs text-slate-500 mb-3">
-                                Copy các chuỗi <code class="bg-slate-100 px-1 rounded">HSK1_...</code> học viên gửi qua Zalo/Messenger và dán vào ô dưới đây (mỗi mã 1 dòng hoặc cách nhau khoảng trắng):
+                                Copy các chuỗi <code class="bg-slate-100 px-1 rounded">HSK1_...</code> học viên gửi qua Zalo/Messenger và dán vào ô dưới đây:
                             </p>
                             <textarea id="teacher-import-tokens" rows="4"
                                 placeholder="Dán 1 hoặc nhiều mã HSK1_eyJ... vào đây..."
@@ -727,15 +1013,14 @@
                         </div>
                     </div>
 
-                    <!-- Method 2: Google Sheets Webhook Setup -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-1">
                                 <i class="fa-solid fa-table text-emerald-600"></i>
-                                Cách 2: Kết nối tự động với Google Sheets
+                                Cách 2: Kết nối tự động với Google Sheets (Đồng bộ cả file ghi âm)
                             </h3>
                             <p class="text-xs text-slate-500 mb-3">
-                                Dán URL Web App tại đây. Giáo viên dùng URL này để xem bảng lớp; hãy gửi cùng URL cho học viên để các em nhập một lần ở màn hình đăng nhập:
+                                Dán URL Web App tại đây. Khi học viên ghi âm xong, bản thu âm sẽ tự động gửi lên Google Sheets để giáo viên mở nghe lại:
                             </p>
                             <div class="flex gap-2 mb-3">
                                 <input type="url" id="teacher-webhook-url" placeholder="https://script.google.com/macros/s/.../exec"
@@ -751,11 +1036,10 @@
                             <ol class="list-decimal list-inside space-y-1.5 mt-2 text-slate-600">
                                 <li>Tạo Google Sheet mới, mở <strong>Extensions → Apps Script</strong>.</li>
                                 <li>Xóa mã cũ, dán toàn bộ mã ở khung bên dưới rồi lưu.</li>
-                                <li>Trong <strong>Project Settings → Script properties</strong>, thêm <code>TEACHER_PASSWORD</code> (mật khẩu riêng) và <code>SPREADSHEET_ID</code> (ID nằm giữa <code>/d/</code> và <code>/edit</code> trong URL Google Sheet).</li>
-                                <li>Chọn <strong>Deploy → New deployment → Web app</strong>; chạy dưới tài khoản của bạn, quyền truy cập chọn <strong>Anyone</strong>.</li>
-                                <li>Sao chép URL kết thúc bằng <code>/exec</code>, dán vào ô URL phía trên và gửi URL đó cho học viên.</li>
+                                <li>Trong <strong>Project Settings → Script properties</strong>, thêm <code>TEACHER_PASSWORD</code> và <code>SPREADSHEET_ID</code>.</li>
+                                <li>Chọn <strong>Deploy → New deployment → Web app</strong>; quyền truy cập chọn <strong>Anyone</strong>.</li>
                             </ol>
-                            <button type="button" onclick="copyAppsScriptCode()" class="mt-3 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold">Sao chép mã Apps Script</button>
+                            <button type="button" onclick="copyAppsScriptCode()" class="mt-3 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold cursor-pointer">Sao chép mã Apps Script</button>
                             <pre id="apps-script-code" class="mt-2 p-3 bg-slate-900 text-emerald-300 rounded-lg overflow-x-auto font-mono text-[10px] leading-relaxed whitespace-pre">function getSheet_() {
   const spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
   if (!spreadsheetId) throw new Error('Missing Script Property: SPREADSHEET_ID');
@@ -827,6 +1111,8 @@ function doGet(e) {
           st.hintsUsed = Number(row[4] || st.hintsUsed || 0);
           st.ordering = st.ordering || JSON.parse(String(row[5] || '{}'));
           st.dictation = st.dictation || JSON.parse(String(row[6] || '{}'));
+          st.reading = st.reading || {};
+          st.speaking = st.speaking || {};
           st.isCloud = true;
           students.push(st);
         } catch (parseErr) {}
@@ -837,12 +1123,11 @@ function doGet(e) {
     return jsonOut_({ok:false, error:String(err)}, callback);
   }
 }</pre>
-                            <p class="mt-2 text-[10px] text-slate-500">Lưu ý: bảng tính nên để riêng tư. Google Apps Script kiểm tra mật khẩu phía máy chủ trước khi trả kết quả giáo viên; học viên chỉ có quyền gửi bài.</p>
                         </details>
                     </div>
                 </div>
 
-                <!-- Top 3 leaderboard (teacher-only) -->
+                <!-- Top 3 leaderboard -->
                 <div class="bg-white rounded-2xl border border-amber-200 shadow-xs p-5">
                     <div class="flex items-center justify-between gap-3 mb-3">
                         <h3 class="font-bold text-slate-800"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Bảng xếp hạng Top 3 theo xu</h3>
@@ -853,12 +1138,12 @@ function doGet(e) {
                     </div>
                 </div>
 
-                <!-- Class Leaderboard & Roster Table -->
+                <!-- Class Roster Table -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="px-5 py-4 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
                         <div>
                             <h3 class="font-bold text-slate-800 text-base">Bảng Tổng Hợp Kết Quả Học Viên (<span id="teacher-student-count">0</span> học viên)</h3>
-                            <p class="text-xs text-slate-500">Bao gồm dữ liệu đồng bộ Google Sheets, học viên làm trên máy này và dữ liệu nhập qua Mã/CSV.</p>
+                            <p class="text-xs text-slate-500">Bao gồm điểm Sắp xếp, Nghe chép, số bài ghi âm Đọc & Nói.</p>
                         </div>
                         <button onclick="clearImportedTeacherRecords()"
                             class="text-xs font-semibold text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition cursor-pointer">
@@ -872,23 +1157,21 @@ function doGet(e) {
                                 <tr class="bg-slate-100/80 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
                                     <th class="py-3 px-4 font-bold">Hạng</th>
                                     <th class="py-3 px-4 font-bold">Họ tên / Lớp</th>
-                                    <th class="py-3 px-4 font-bold text-center">Sắp xếp câu</th>
-                                    <th class="py-3 px-4 font-bold text-center">Luyện nghe</th>
+                                    <th class="py-3 px-4 font-bold text-center">Sắp xếp</th>
+                                    <th class="py-3 px-4 font-bold text-center">Nghe chép</th>
+                                    <th class="py-3 px-4 font-bold text-center">Đọc / Nói</th>
                                     <th class="py-3 px-4 font-bold text-center">Xu</th>
-                                    <th class="py-3 px-4 font-bold text-center">Tổng điểm</th>
-                                    <th class="py-3 px-4 font-bold text-center">Đánh giá</th>
+                                    <th class="py-3 px-4 font-bold text-center">Tổng</th>
                                     <th class="py-3 px-4 font-bold">Cập nhật</th>
-                                    <th class="py-3 px-4 font-bold text-right">Thao tác</th>
+                                    <th class="py-3 px-4 font-bold text-right">Chấm bài</th>
                                 </tr>
                             </thead>
-                            <tbody id="teacher-roster-tbody" class="divide-y divide-slate-100 text-sm">
-                                <!-- Rendered dynamically -->
-                            </tbody>
+                            <tbody id="teacher-roster-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Class Weakness Analytics (Câu học viên hay sai nhất) -->
+                <!-- Class Weakness Analytics -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
                         <i class="fa-solid fa-chart-simple text-rose-500"></i>
@@ -900,7 +1183,6 @@ function doGet(e) {
                 </div>
             </div>
         </section>
-
 
         <!-- ==================== TAB: PRONUNCIATION (PHỤ ÂM & NGUYÊN ÂM) ==================== -->
         <section id="section-pronunciation" class="hidden space-y-6">
@@ -935,7 +1217,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Thanh hiển thị âm đang chọn -->
             <div id="pron-now-playing" class="bg-gradient-to-r from-orange-50 via-amber-50 to-teal-50 border border-amber-200/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div id="pron-speaker-icon" class="w-11 h-11 rounded-2xl bg-brand-red text-white flex items-center justify-center text-lg shadow-xs shrink-0">
@@ -955,7 +1236,6 @@ function doGet(e) {
                 </button>
             </div>
 
-            <!-- Khối 1: Phụ âm (声母) -->
             <div id="pron-initials-block" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -967,11 +1247,9 @@ function doGet(e) {
                     </div>
                     <span class="text-xs font-bold bg-brand-redLight text-brand-red px-2.5 py-1 rounded-full">23 phụ âm</span>
                 </div>
-
                 <div id="pron-initials-container" class="space-y-5"></div>
             </div>
 
-            <!-- Khối 2: Nguyên âm (韵母) -->
             <div id="pron-finals-block" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -983,14 +1261,13 @@ function doGet(e) {
                     </div>
                     <span class="text-xs font-bold bg-brand-tealLight text-brand-teal px-2.5 py-1 rounded-full">36 nguyên âm</span>
                 </div>
-
                 <div id="pron-finals-container" class="space-y-5"></div>
             </div>
         </section>
 
     </main>
 
-    <!-- Student Detail Modal for Teacher -->
+    <!-- Student Detail & Audio Grading Modal for Teacher -->
     <div id="teacher-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
             <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
@@ -1002,16 +1279,14 @@ function doGet(e) {
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            <div id="td-modal-body" class="p-6 overflow-y-auto space-y-4 text-sm">
-                <!-- Injected dynamically -->
-            </div>
+            <div id="td-modal-body" class="p-6 overflow-y-auto space-y-4 text-sm"></div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-10 py-5 px-4">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <p>© 2026 <strong>HSK 1 Master 3.0</strong> — 100 câu Pinyin + 100 câu nghe chép chọn lọc theo danh sách từ vựng HSK 3.0 cấp 1 (300 từ).</p>
+            <p>© 2026 <strong>HSK 1 Master 3.0</strong> — 100 câu sắp xếp + 100 câu nghe chép + Luyện đọc & Luyện nói ghi âm chuẩn HSK 3.0 cấp 1.</p>
             <button onclick="toggleGithubModal(true)"
                 class="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-brand-red bg-slate-100 hover:bg-orange-50 px-3 py-1.5 rounded-lg transition cursor-pointer">
                 <i class="fa-brands fa-github text-sm"></i>
@@ -1023,10 +1298,47 @@ function doGet(e) {
     <!-- Application Data & Logic -->
     <script>
         // =========================================================================
-        // 1. NGÂN HÀNG 100 CÂU SẮP XẾP CHUẨN HSK 1 (CHIA 10 BÀI - MỖI BÀI 10 CÂU)
+        // 0. TIỆN ÍCH THÔNG BÁO TOAST & MODAL
         // =========================================================================
-        // HSK 3.0 cấp 1: bộ câu luyện tự biên soạn theo danh sách 300 từ vựng trong đề cương mới.
-        // Mỗi thẻ gồm một đơn vị từ vựng; học viên tự viết Pinyin, không thể bấm thẻ để chèn đáp án.
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const styles = {
+                success: 'bg-emerald-600 text-white border-emerald-700',
+                error: 'bg-rose-600 text-white border-rose-700',
+                info: 'bg-slate-800 text-white border-slate-900'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-exclamation',
+                info: 'fa-circle-info'
+            };
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-medium transition-all duration-300 ${styles[type] || styles.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base shrink-0"></i><span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-6px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3400);
+        }
+
+        function toggleGithubModal(show) {
+            const modal = document.getElementById('github-modal');
+            if (!modal) return;
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // =========================================================================
+        // 1. NGÂN HÀNG 100 CÂU SẮP XẾP & NGHE CHÉP CHUẨN HSK 1 (3.0)
+        // =========================================================================
         const HSK1_V3_PINYIN = {
             '我':'wǒ','是':'shì','好':'hǎo','了':'le','学生':'xuéshēng','你':'nǐ','老师':'lǎoshī','吗':'ma','他':'tā','大学生':'dàxuéshēng','她':'tā','我们':'wǒmen','同学':'tóngxué','你们':'nǐmen','他们':'tāmen','中国':'Zhōngguó','人':'rén','不':'bù','大家':'dàjiā','都':'dōu','很':'hěn','高兴':'gāoxìng',
             '的':'de','妈妈':'māma','在':'zài','家':'jiā','爸爸':'bàba','公司':'gōngsī','工作':'gōngzuò','做饭':'zuòfàn','哥哥':'gēge','姐姐':'jiějie','弟弟':'dìdi','喜欢':'xǐhuan','玩':'wán','妹妹':'mèimei','吃':'chī','苹果':'píngguǒ','有':'yǒu','一':'yī','个':'gè','两':'liǎng','女儿':'nǚ’ér','几':'jǐ',
@@ -1045,7 +1357,7 @@ function doGet(e) {
             ["你们|是|学生|吗", "Các bạn là học sinh phải không?"],
             ["他们|是|中国|人", "Họ là người Trung Quốc."],
             ["我|不|是|老师", "Tôi không phải là giáo viên."],
-            ["他|不|是|学生", "Anh ấy không phải là học sinh."],
+            ["他|不|是|学生", "Anh ấy không phải là giáo viên/học sinh."],
             ["大家|都|很|高兴", "Mọi người đều rất vui."],
             ["我|的|妈妈|在|家", "Mẹ tôi ở nhà."],
             ["爸爸|在|公司|工作", "Bố làm việc ở công ty."],
@@ -1136,12 +1448,10 @@ function doGet(e) {
             ["你|认识|他|吗", "Bạn có quen anh ấy không?"],
             ["我|知道", "Tôi biết."],
             ["你|知道|吗", "Bạn biết không?"],
-            ["再见", "Tạm biệt."],
+            ["再见", "Tạm biệt."]
         ];
         const HSK1_SENTENCE_BANK = HSK1_V3_ROWS.map((row, idx) => {
             const parts = row[0].split('|');
-            const missing = parts.filter(part => !HSK1_V3_PINYIN[part]);
-            if (missing.length) console.warn('Thiếu Pinyin trong từ điển HSK1 3.0:', missing);
             const pinyinParts = parts.map(part => HSK1_V3_PINYIN[part] || part);
             const pinyin = pinyinParts.join(' ');
             return {
@@ -1163,6 +1473,118 @@ function doGet(e) {
         }));
 
         // =========================================================================
+        // 2. NGÂN HÀNG LUYỆN ĐỌC (20 CÂU + 10 ĐOẠN VĂN) & LUYỆN NÓI (20 CÂU HỎI) HSK 1 3.0
+        // =========================================================================
+        const READING_SENTENCES = [
+            { id: 'rs_1', topicIdx: 0, topic: 'Chủ đề 1: Chào hỏi & Làm quen', hanzi: '你好，我叫王明，很高兴认识你。', pinyin: 'Nǐ hǎo, wǒ jiào Wáng Míng, hěn gāoxìng rènshi nǐ.', meaning: 'Xin chào, tôi tên là Vương Minh, rất vui được làm quen với bạn.' },
+            { id: 'rs_2', topicIdx: 0, topic: 'Chủ đề 1: Chào hỏi & Làm quen', hanzi: '他不是老师，他是我们学校的学生。', pinyin: 'Tā bú shì lǎoshī, tā shì wǒmen xuéxiào de xuéshēng.', meaning: 'Anh ấy không phải giáo viên, anh ấy là học sinh của trường chúng tôi.' },
+            { id: 'rs_3', topicIdx: 1, topic: 'Chủ đề 2: Gia đình & Người thân', hanzi: '我家有四口人：爸爸、妈妈、哥哥和我。', pinyin: 'Wǒ jiā yǒu sì kǒu rén: bàba, māma, gēge hé wǒ.', meaning: 'Nhà tôi có bốn người: bố, mẹ, anh trai và tôi.' },
+            { id: 'rs_4', topicIdx: 1, topic: 'Chủ đề 2: Gia đình & Người thân', hanzi: '爸爸在公司工作，妈妈每天在家做饭。', pinyin: 'Bàba zài gōngsī gōngzuò, māma měitiān zài jiā zuòfàn.', meaning: 'Bố làm việc ở công ty, mẹ hằng ngày nấu cơm ở nhà.' },
+            { id: 'rs_5', topicIdx: 2, topic: 'Chủ đề 3: Học tập & Ngôn ngữ', hanzi: '我在大学学习汉语，我会说一点儿中文。', pinyin: 'Wǒ zài dàxué xuéxí Hànyǔ, wǒ huì shuō yìdiǎnr Zhōngwén.', meaning: 'Tôi học tiếng Hán ở trường đại học, tôi biết nói một chút tiếng Trung.' },
+            { id: 'rs_6', topicIdx: 2, topic: 'Chủ đề 3: Học tập & Ngôn ngữ', hanzi: '老师会写很多汉字，我们都喜欢上她的课。', pinyin: 'Lǎoshī huì xiě hěn duō Hànzì, wǒmen dōu xǐhuan shàng tā de kè.', meaning: 'Cô giáo biết viết rất nhiều chữ Hán, chúng tôi đều thích học tiết của cô.' },
+            { id: 'rs_7', topicIdx: 3, topic: 'Chủ đề 4: Thời gian & Sinh hoạt', hanzi: '我每天早上七点起床，上午八点去学校上课。', pinyin: 'Wǒ měitiān zǎoshang qī diǎn qǐchuáng, shàngwǔ bā diǎn qù xuéxiào shàngkè.', meaning: 'Mỗi sáng tôi thức dậy lúc 7 giờ, 8 giờ sáng đến trường học.' },
+            { id: 'rs_8', topicIdx: 3, topic: 'Chủ đề 4: Thời gian & Sinh hoạt', hanzi: '昨天是星期天，我在家看书、休息。', pinyin: 'Zuótiān shì xīngqītiān, wǒ zài jiā kàn shū, xiūxi.', meaning: 'Hôm qua là Chủ nhật, tôi ở nhà đọc sách và nghỉ ngơi.' },
+            { id: 'rs_9', topicIdx: 4, topic: 'Chủ đề 5: Ăn uống & Món ngon', hanzi: '中午我们在饭店吃米饭，妈妈做的饺子很好吃。', pinyin: 'Zhōngwǔ wǒmen zài fàndiàn chī mǐfàn, māma zuò de jiǎozi hěn hǎochī.', meaning: 'Buổi trưa chúng tôi ăn cơm ở nhà hàng, sủi cảo mẹ làm rất ngon.' },
+            { id: 'rs_10', topicIdx: 4, topic: 'Chủ đề 5: Ăn uống & Món ngon', hanzi: '爸爸喜欢喝茶，妹妹喜欢喝牛奶和吃苹果。', pinyin: 'Bàba xǐhuan hē chá, mèimei xǐhuan hē niúnǎi hé chī píngguǒ.', meaning: 'Bố thích uống trà, em gái thích uống sữa và ăn táo.' },
+            { id: 'rs_11', topicIdx: 5, topic: 'Chủ đề 6: Sở thích & Giải trí', hanzi: '我喜欢听歌和看电影，这个电影很好看。', pinyin: 'Wǒ xǐhuan tīng gē hé kàn diànyǐng, zhège diànyǐng hěn hǎokàn.', meaning: 'Tôi thích nghe nhạc và xem phim, bộ phim này rất hay.' },
+            { id: 'rs_12', topicIdx: 5, topic: 'Chủ đề 6: Sở thích & Giải trí', hanzi: '明天下午我和同学一起去电影院看电影。', pinyin: 'Míngtiān xiàwǔ wǒ hé tóngxué yìqǐ qù diànyǐngyuàn kàn diànyǐng.', meaning: 'Chiều mai tôi và bạn học cùng đi rạp chiếu phim xem phim.' },
+            { id: 'rs_13', topicIdx: 6, topic: 'Chủ đề 7: Mua sắm & Cửa hàng', hanzi: '我想去商店买水果，那个苹果多少钱？', pinyin: 'Wǒ xiǎng qù shāngdiàn mǎi shuǐguǒ, nàge píngguǒ duōshao qián?', meaning: 'Tôi muốn đi cửa hàng mua hoa quả, quả táo kia bao nhiêu tiền?' },
+            { id: 'rs_14', topicIdx: 6, topic: 'Chủ đề 7: Mua sắm & Cửa hàng', hanzi: '超市里的东西很便宜，这个新手机有点儿贵。', pinyin: 'Chāoshì lǐ de dōngxi hěn piányi, zhège xīn shǒujī yǒudiǎnr guì.', meaning: 'Đồ trong siêu thị rất rẻ, chiếc điện thoại mới này hơi đắt.' },
+            { id: 'rs_15', topicIdx: 7, topic: 'Chủ đề 8: Thời tiết & Cảm xúc', hanzi: '今天天气很好，不冷也不热，大家都很高兴。', pinyin: 'Jīntiān tiānqì hěn hǎo, bù lěng yě bú rè, dàjiā dōu hěn gāoxìng.', meaning: 'Hôm nay thời tiết rất đẹp, không lạnh cũng không nóng, mọi người đều rất vui.' },
+            { id: 'rs_16', topicIdx: 7, topic: 'Chủ đề 8: Thời tiết & Cảm xúc', hanzi: '昨天下雨了，外边很冷，我不想出去。', pinyin: 'Zuótiān xiàyǔ le, wàibian hěn lěng, wǒ bù xiǎng chūqù.', meaning: 'Hôm qua trời mưa rồi, bên ngoài rất lạnh, tôi không muốn ra ngoài.' },
+            { id: 'rs_17', topicIdx: 8, topic: 'Chủ đề 9: Đi lại & Nơi chốn', hanzi: '请问医院在哪里？去医院坐出租车很方便。', pinyin: 'Qǐngwèn yīyuàn zài nǎlǐ? Qù yīyuàn zuò chūzūchē hěn fāngbiàn.', meaning: 'Xin hỏi bệnh viện ở đâu? Đi bệnh viện ngồi taxi rất tiện.' },
+            { id: 'rs_18', topicIdx: 8, topic: 'Chủ đề 9: Đi lại & Nơi chốn', hanzi: '明年我要坐火车去中国，我住在朋友家。', pinyin: 'Míngnián wǒ yào zuò huǒchē qù Zhōngguó, wǒ zhù zài péngyou jiā.', meaning: 'Năm sau tôi sẽ đi tàu hỏa đến Trung Quốc, tôi sống ở nhà bạn.' },
+            { id: 'rs_19', topicIdx: 9, topic: 'Chủ đề 10: Giao tiếp tổng hợp', hanzi: '对不起，我今天很忙，现在没有时间。', pinyin: 'Duìbuqǐ, wǒ jīntiān hěn máng, xiànzài méiyǒu shíjiān.', meaning: 'Xin lỗi, hôm nay tôi rất bận, bây giờ không có thời gian.' },
+            { id: 'rs_20', topicIdx: 9, topic: 'Chủ đề 10: Giao tiếp tổng hợp', hanzi: '晚上我给妈妈打电话，谢谢你的帮助，再见！', pinyin: 'Wǎnshang wǒ gěi māma dǎ diànhuà, xièxie nǐ de bāngzhù, zàijiàn!', meaning: 'Buổi tối tôi gọi điện cho mẹ, cảm ơn sự giúp đỡ của bạn, tạm biệt!' }
+        ];
+
+        const READING_PASSAGES = [
+            {
+                id: 'rp_1', topicIdx: 0, topic: 'Bài đọc 1: Giới thiệu bản thân & Bạn học',
+                hanzi: '大家好！我叫李明，我是中国人，今年二十岁。我现在是大学生，在大学学习汉语和英文。我的同学大卫也很喜欢学习中文，我们每天一起上课、一起读书，我们都是好朋友。',
+                pinyin: 'Dàjiā hǎo! Wǒ jiào Lǐ Míng, wǒ shì Zhōngguórén, jīnnián èrshí suì. Wǒ xiànzài shì dàxuéshēng, zài dàxué xuéxí Hànyǔ hé Yīngwén. Wǒ de tóngxué Dàwèi yě hěn xǐhuan xuéxí Zhōngwén, wǒmen měitiān yìqǐ shàngkè, yìqǐ dúshū, wǒmen dōu shì hǎo péngyou.',
+                meaning: 'Chào mọi người! Tôi tên là Lý Minh, tôi là người Trung Quốc, năm nay 20 tuổi. Bây giờ tôi là sinh viên đại học, học tiếng Hán và tiếng Anh ở trường. Bạn học của tôi là David cũng rất thích học tiếng Trung, mỗi ngày chúng tôi cùng lên lớp, cùng đọc sách, chúng tôi đều là bạn tốt.'
+            },
+            {
+                id: 'rp_2', topicIdx: 1, topic: 'Bài đọc 2: Gia đình của tôi',
+                hanzi: '我家有五个人：爸爸、妈妈、姐姐、弟弟和我。爸爸在公司工作，他每天下午五点下班。妈妈是老师，她在学校工作。姐姐是大学生，弟弟喜欢玩，妹妹喜欢吃苹果。我们家每天晚上都在一起吃饭、看电视。',
+                pinyin: 'Wǒ jiā yǒu wǔ gè rén: bàba, māma, jiějie, dìdi hé wǒ. Bàba zài gōngsī gōngzuò, tā měitiān xiàwǔ wǔ diǎn xiàbān. Māma shì lǎoshī, tā zài xuéxiào gōngzuò. Jiějie shì dàxuéshēng, dìdi xǐhuan wán, mèimei xǐhuan chī píngguǒ. Wǒmen jiā měitiān wǎnshang dōu zài yìqǐ chīfàn, kàn diànshì.',
+                meaning: 'Nhà tôi có năm người: bố, mẹ, chị gái, em trai và tôi. Bố làm việc ở công ty, mỗi chiều ông tan làm lúc 5 giờ. Mẹ là giáo viên, bà làm việc ở trường học. Chị gái là sinh viên, em trai thích chơi, em gái thích ăn táo. Tối nào cả nhà tôi cũng cùng nhau ăn cơm và xem ti vi.'
+            },
+            {
+                id: 'rp_3', topicIdx: 2, topic: 'Bài đọc 3: Học tiếng Trung ở trường',
+                hanzi: '今天是星期一，上午我有汉语课。老师说汉语很有意思，她教我们读课文、写汉字。我现在会说很多中文，也会写我的中文名字。下午我去学校的书店买书，那里有很多好看的中文书。',
+                pinyin: 'Jīntiān shì xīngqīyī, shàngwǔ wǒ yǒu Hànyǔ kè. Lǎoshī shuō Hànyǔ hěn yǒu yìsi, tā jiāo wǒmen dú kèwén, xiě Hànzì. Wǒ xiànzài huì shuō hěn duō Zhōngwén, yě huì xiě wǒ de Zhōngwén míngzi. Xiàwǔ wǒ qù xuéxiào de shūdiàn mǎi shū, nàlǐ yǒu hěn duō hǎokàn de Zhōngwén shū.',
+                meaning: 'Hôm nay là thứ Hai, buổi sáng tôi có tiết tiếng Hán. Cô giáo nói tiếng Hán rất thú vị, cô dạy chúng tôi đọc bài khóa và viết chữ Hán. Bây giờ tôi biết nói rất nhiều tiếng Trung, cũng biết viết tên tiếng Trung của mình. Buổi chiều tôi đến hiệu sách của trường mua sách, ở đó có rất nhiều sách tiếng Trung hay.'
+            },
+            {
+                id: 'rp_4', topicIdx: 3, topic: 'Bài đọc 4: Một ngày của tôi',
+                hanzi: '我每天早上七点起床，吃一点儿面包，喝一杯牛奶。上午八点我去学校上课，中午十二点在学校吃午饭。下午四点我回家，晚上七点给妈妈打电话。昨天是星期天，我没有课，在家休息了一天。',
+                pinyin: 'Wǒ měitiān zǎoshang qī diǎn qǐchuáng, chī yìdiǎnr miànbāo, hē yì bēi niúnǎi. Shàngwǔ bā diǎn wǒ qù xuéxiào shàngkè, zhōngwǔ shí’èr diǎn zài xuéxiào chī wǔfàn. Xiàwǔ sì diǎn wǒ huí jiā, wǎnshang qī diǎn gěi māma dǎ diànhuà. Zuótiān shì xīngqītiān, wǒ méiyǒu kè, zài jiā xiūxi le yì tiān.',
+                meaning: 'Mỗi sáng tôi dậy lúc 7 giờ, ăn một chút bánh mì và uống một cốc sữa. 8 giờ sáng tôi đến trường học, 12 giờ trưa ăn cơm trưa ở trường. 4 giờ chiều tôi về nhà, 7 giờ tối gọi điện cho mẹ. Hôm qua là Chủ nhật, tôi không có tiết học nên nghỉ ngơi ở nhà cả ngày.'
+            },
+            {
+                id: 'rp_5', topicIdx: 4, topic: 'Bài đọc 5: Ăn uống cùng gia đình',
+                hanzi: '妈妈做饭很好吃，我们都喜欢在家吃饭。今天中午妈妈做了饺子和米饭，还买了水果。爸爸喜欢喝茶，我喜欢喝水，弟弟喜欢吃饺子。星期天我们有时候也去饭店吃饭，饭店里的菜也很好吃。',
+                pinyin: 'Māma zuòfàn hěn hǎochī, wǒmen dōu xǐhuan zài jiā chīfàn. Jīntiān zhōngwǔ māma zuò le jiǎozi hé mǐfàn, hái mǎi le shuǐguǒ. Bàba xǐhuan hē chá, wǒ xǐhuan hē shuǐ, dìdi xǐhuan chī jiǎozi. Xīngqītiān wǒmen yǒushíhou yě qù fàndiàn chīfàn, fàndiàn lǐ de cài yě hěn hǎochī.',
+                meaning: 'Mẹ nấu ăn rất ngon, chúng tôi đều thích ăn cơm ở nhà. Trưa nay mẹ làm sủi cảo và cơm, còn mua cả hoa quả. Bố thích uống trà, tôi thích uống nước, em trai thích ăn sủi cảo. Chủ nhật thỉnh thoảng chúng tôi cũng ra nhà hàng ăn cơm, món ăn ở nhà hàng cũng rất ngon.'
+            },
+            {
+                id: 'rp_6', topicIdx: 5, topic: 'Bài đọc 6: Sở thích cuối tuần',
+                hanzi: '我喜欢看电影，也喜欢听歌。这首歌很好听，我每天晚上都听。明天是星期六，我和同学想去电影院看一个中国电影。听说那个电影很好看，我们都想去看。',
+                pinyin: 'Wǒ xǐhuan kàn diànyǐng, yě xǐhuan tīng gē. Zhè shǒu gē hěn hǎotīng, wǒ měitiān wǎnshang dōu tīng. Míngtiān shì xīngqīliù, wǒ hé tóngxué xiǎng qù diànyǐngyuàn kàn yí gè Zhōngguó diànyǐng. Tīngshuō nàge diànyǐng hěn hǎokàn, wǒmen dōu xiǎng qù kàn.',
+                meaning: 'Tôi thích xem phim và cũng thích nghe nhạc. Bài hát này rất hay, tối nào tôi cũng nghe. Ngày mai là thứ Bảy, tôi và bạn học muốn đi rạp chiếu phim xem một bộ phim Trung Quốc. Nghe nói bộ phim đó rất hay, chúng tôi đều muốn đi xem.'
+            },
+            {
+                id: 'rp_7', topicIdx: 6, topic: 'Bài đọc 7: Đi siêu thị và hiệu sách',
+                hanzi: '现在是下午三点，我想去超市买东西。超市在学校那边，离我家不远。我想买苹果、面包和两个杯子，超市的东西很便宜。买完东西，我还要去书店看书，今天我很高兴。',
+                pinyin: 'Xiànzài shì xiàwǔ sān diǎn, wǒ xiǎng qù chāoshì mǎi dōngxi. Chāoshì zài xuéxiào nàbiān, lí wǒ jiā bù yuǎn. Wǒ xiǎng mǎi píngguǒ, miànbāo hé liǎng gè bēizi, chāoshì de dōngxi hěn piányi. Mǎi wán dōngxi, wǒ hái yào qù shūdiàn kàn shū, jīntiān wǒ hěn gāoxìng.',
+                meaning: 'Bây giờ là 3 giờ chiều, tôi muốn đi siêu thị mua đồ. Siêu thị ở phía bên kia trường học, cách nhà tôi không xa. Tôi muốn mua táo, bánh mì và hai cái cốc, đồ ở siêu thị rất rẻ. Mua xong đồ, tôi còn muốn đến hiệu sách đọc sách, hôm nay tôi rất vui.'
+            },
+            {
+                id: 'rp_8', topicIdx: 7, topic: 'Bài đọc 8: Thời tiết bốn mùa',
+                hanzi: '昨天下雨了，外边很冷，我穿了很多衣服。今天天气很好，不冷也不热，现在有很多人在外边玩。你喜欢这个天气吗？明年天气热的时候，我想去海边休息。',
+                pinyin: 'Zuótiān xiàyǔ le, wàibian hěn lěng, wǒ chuān le hěn duō yīfu. Jīntiān tiānqì hěn hǎo, bù lěng yě bú rè, xiànzài yǒu hěn duō rén zài wàibian wán. Nǐ xǐhuan zhège tiānqì ma? Míngnián tiānqì rè de shíhou, wǒ xiǎng qù hǎibiān xiūxi.',
+                meaning: 'Hôm qua trời mưa rồi, bên ngoài rất lạnh, tôi mặc rất nhiều quần áo. Hôm nay thời tiết rất đẹp, không lạnh cũng không nóng, bây giờ có rất nhiều người chơi ở bên ngoài. Bạn có thích thời tiết này không? Năm sau khi trời nóng, tôi muốn đi biển nghỉ ngơi.'
+            },
+            {
+                id: 'rp_9', topicIdx: 8, topic: 'Bài đọc 9: Hỏi đường và đi lại',
+                hanzi: '请问，医院在哪里？医院在商店前面，离这里有点儿远。爸爸会开车，他可以开车去，也可以坐出租车去。明年我要坐火车去北京旅游，我还没去过中国，我很想去看看。',
+                pinyin: 'Qǐngwèn, yīyuàn zài nǎlǐ? Yīyuàn zài shāngdiàn qiánmiàn, lí zhèlǐ yǒudiǎnr yuǎn. Bàba huì kāichē, tā kěyǐ kāichē qù, yě kěyǐ zuò chūzūchē qù. Míngnián wǒ yào zuò huǒchē qù Běijīng lǚyóu, wǒ hái méi qù guo Zhōngguó, wǒ hěn xiǎng qù kànkan.',
+                meaning: 'Xin hỏi bệnh viện ở đâu? Bệnh viện ở phía trước cửa hàng, cách đây hơi xa. Bố biết lái xe, bố có thể lái xe đi, cũng có thể đi taxi. Năm sau tôi sẽ đi tàu hỏa đến Bắc Kinh du lịch, tôi chưa từng đến Trung Quốc, tôi rất muốn đến xem.'
+            },
+            {
+                id: 'rp_10', topicIdx: 9, topic: 'Bài đọc 10: Cuộc gọi với bạn thân',
+                hanzi: '喂，你好！我是大卫。你今天忙吗？下午你有时间吗？我想请你去我家喝茶、吃水果。如果今天你没有时间，没关系，我们明天下午在学校见面吧！谢谢你，再见！',
+                pinyin: 'Wéi, nǐ hǎo! Wǒ shì Dàwèi. Nǐ jīntiān máng ma? Xiàwǔ nǐ yǒu shíjiān ma? Wǒ xiǎng qǐng nǐ qù wǒ jiā hē chá, chī shuǐguǒ. Rúguǒ jīntiān nǐ méiyǒu shíjiān, méiguānxi, wǒmen míngtiān xiàwǔ zài xuéxiào jiànmiàn ba! Xièxie nǐ, zàijiàn!',
+                meaning: 'Alo, xin chào! Tôi là David. Hôm nay bạn bận không? Buổi chiều bạn có thời gian không? Tôi muốn mời bạn đến nhà tôi uống trà, ăn hoa quả. Nếu hôm nay bạn không có thời gian thì không sao, chiều mai chúng ta gặp nhau ở trường nhé! Cảm ơn bạn, tạm biệt!'
+            }
+        ];
+
+        const SPEAKING_QUESTIONS = [
+            { id: 'sp_1', topicIdx: 0, topic: 'Chủ đề 1: Chào hỏi & Tên tuổi', question: '你好！请问你叫什么名字？你是哪国人？', pinyin: 'Nǐ hǎo! Qǐngwèn nǐ jiào shénme míngzi? Nǐ shì nǎ guó rén?', meaning: 'Xin chào! Xin hỏi bạn tên là gì? Bạn là người nước nào?', sampleHanzi: '你好！我叫明英，我是越南人，很高兴认识你。', samplePinyin: 'Nǐ hǎo! Wǒ jiào Míng Yīng, wǒ shì Yuènánrén, hěn gāoxìng rènshi nǐ.', sampleMeaning: 'Xin chào! Tôi tên là Minh Anh, tôi là người Việt Nam, rất vui được làm quen với bạn.', vocab: 'Từ gợi ý: 叫 (tên là), 越南人 (người Việt Nam), 高兴 (vui)' },
+            { id: 'sp_2', topicIdx: 0, topic: 'Chủ đề 1: Chào hỏi & Tên tuổi', question: '你是学生还是老师？你在哪里学习或工作？', pinyin: 'Nǐ shì xuéshēng háishi lǎoshī? Nǐ zài nǎlǐ xuéxí huò gōngzuò?', meaning: 'Bạn là học sinh hay giáo viên? Bạn học tập hoặc làm việc ở đâu?', sampleHanzi: '我是大学生，我在大学学习。', samplePinyin: 'Wǒ shì dàxuéshēng, wǒ zài dàxué xuéxí.', sampleMeaning: 'Tôi là sinh viên đại học, tôi học ở trường đại học.', vocab: 'Từ gợi ý: 大学生 (sinh viên), 公司 (công ty), 学校 (trường học)' },
+            { id: 'sp_3', topicIdx: 1, topic: 'Chủ đề 2: Gia đình & Người thân', question: '你家有几口人？都有谁？', pinyin: 'Nǐ jiā yǒu jǐ kǒu rén? Dōu yǒu shéi?', meaning: 'Nhà bạn có mấy người? Gồm những ai?', sampleHanzi: '我家有四口人：爸爸、妈妈、哥哥和我。', samplePinyin: 'Wǒ jiā yǒu sì kǒu rén: bàba, māma, gēge hé wǒ.', sampleMeaning: 'Nhà tôi có bốn người: bố, mẹ, anh trai và tôi.', vocab: 'Từ gợi ý: 爸爸, 妈妈, 哥哥, 姐姐, 弟弟, 妹妹' },
+            { id: 'sp_4', topicIdx: 1, topic: 'Chủ đề 2: Gia đình & Người thân', question: '你的爸爸和妈妈在哪里工作？', pinyin: 'Nǐ de bàba hé māma zài nǎlǐ gōngzuò?', meaning: 'Bố và mẹ của bạn làm việc ở đâu?', sampleHanzi: '我爸爸在公司工作，我妈妈是老师，她在学校工作。', samplePinyin: 'Wǒ bàba zài gōngsī gōngzuò, wǒ māma shì lǎoshī, tā zài xuéxiào gōngzuò.', sampleMeaning: 'Bố tôi làm việc ở công ty, mẹ tôi là giáo viên, mẹ làm việc ở trường học.', vocab: 'Từ gợi ý: 在公司工作 (làm ở công ty), 在家做饭 (nấu cơm ở nhà)' },
+            { id: 'sp_5', topicIdx: 2, topic: 'Chủ đề 3: Học tập & Ngôn ngữ', question: '你会说汉语吗？你觉得汉语难吗？', pinyin: 'Nǐ huì shuō Hànyǔ ma? Nǐ juéde Hànyǔ nán ma?', meaning: 'Bạn biết nói tiếng Trung không? Bạn thấy tiếng Trung có khó không?', sampleHanzi: '我会说一点儿汉语，我觉得写汉字有点儿难，但是很有意思。', samplePinyin: 'Wǒ huì shuō yìdiǎnr Hànyǔ, wǒ juéde xiě Hànzì yǒudiǎnr nán, dànshì hěn yǒu yìsi.', sampleMeaning: 'Tôi biết nói một chút tiếng Trung, tôi thấy viết chữ Hán hơi khó nhưng rất thú vị.', vocab: 'Từ gợi ý: 会说汉语 (biết nói tiếng Hán), 写汉字 (viết chữ Hán)' },
+            { id: 'sp_6', topicIdx: 2, topic: 'Chủ đề 3: Học tập & Ngôn ngữ', question: '你喜欢读书吗？你常在哪里看书？', pinyin: 'Nǐ xǐhuan dúshū ma? Nǐ cháng zài nǎlǐ kàn shū?', meaning: 'Bạn có thích đọc sách không? Bạn thường đọc sách ở đâu?', sampleHanzi: '我很喜欢读书，我常在学校和家里看书。', samplePinyin: 'Wǒ hěn xǐhuan dúshū, wǒ cháng zài xuéxiào hé jiālǐ kàn shū.', sampleMeaning: 'Tôi rất thích đọc sách, tôi thường đọc sách ở trường và ở nhà.', vocab: 'Từ gợi ý: 读书 / 看书 (đọc sách), 书店 (hiệu sách)' },
+            { id: 'sp_7', topicIdx: 3, topic: 'Chủ đề 4: Thời gian & Lịch trình', question: '你每天早上几点起床？上午几点上课？', pinyin: 'Nǐ měitiān zǎoshang jǐ diǎn qǐchuáng? Shàngwǔ jǐ diǎn shàngkè?', meaning: 'Mỗi sáng bạn thức dậy lúc mấy giờ? Buổi sáng mấy giờ vào học?', sampleHanzi: '我每天早上七点起床，上午八点去学校上课。', samplePinyin: 'Wǒ měitiān zǎoshang qī diǎn qǐchuáng, shàngwǔ bā diǎn qù xuéxiào shàngkè.', sampleMeaning: 'Mỗi sáng tôi dậy lúc 7 giờ, 8 giờ sáng đến trường học.', vocab: 'Từ gợi ý: 早上 (buổi sáng), 七点 (7 giờ), 起床 (thức dậy)' },
+            { id: 'sp_8', topicIdx: 3, topic: 'Chủ đề 4: Thời gian & Lịch trình', question: '昨天和今天你都做了什么？', pinyin: 'Zuótiān hé jīntiān nǐ dōu zuò le shénme?', meaning: 'Hôm qua và hôm nay bạn đã làm những gì?', sampleHanzi: '昨天我在家休息、看电视；今天我去学校学习汉语。', samplePinyin: 'Zuótiān wǒ zài jiā xiūxi, kàn diànshì; jīntiān wǒ qù xuéxiào xuéxí Hànyǔ.', sampleMeaning: 'Hôm qua tôi nghỉ ngơi ở nhà, xem ti vi; hôm nay tôi đến trường học tiếng Trung.', vocab: 'Từ gợi ý: 昨天 (hôm qua), 休息 (nghỉ ngơi), 明天 (ngày mai)' },
+            { id: 'sp_9', topicIdx: 4, topic: 'Chủ đề 5: Ăn uống & Sở thích', question: '你喜欢吃什么？你喜欢吃饺子还是米饭？', pinyin: 'Nǐ xǐhuan chī shénme? Nǐ xǐhuan chī jiǎozi háishi mǐfàn?', meaning: 'Bạn thích ăn gì? Bạn thích ăn sủi cảo hay cơm?', sampleHanzi: '我都喜欢吃，特别是妈妈做的饺子，很好吃！', samplePinyin: 'Wǒ dōu xǐhuan chī, tèbié shì māma zuò de jiǎozi, hěn hǎochī!', sampleMeaning: 'Tôi đều thích ăn, đặc biệt là sủi cảo mẹ làm, rất ngon!', vocab: 'Từ gợi ý: 饺子 (sủi cảo), 米饭 (cơm), 面包 (bánh mì), 水果 (hoa quả)' },
+            { id: 'sp_10', topicIdx: 4, topic: 'Chủ đề 5: Ăn uống & Sở thích', question: '你喜欢喝茶、喝水还是喝牛奶？', pinyin: 'Nǐ xǐhuan hē chá, hē shuǐ háishi hē niúnǎi?', meaning: 'Bạn thích uống trà, uống nước hay uống sữa?', sampleHanzi: '我喜欢喝水和牛奶，我爸爸很喜欢喝茶。', samplePinyin: 'Wǒ xǐhuan hē shuǐ hé niúnǎi, wǒ bàba hěn xǐhuan hē chá.', sampleMeaning: 'Tôi thích uống nước và sữa, bố tôi rất thích uống trà.', vocab: 'Từ gợi ý: 喝茶 (uống trà), 喝水 (uống nước), 喝牛奶 (uống sữa)' },
+            { id: 'sp_11', topicIdx: 5, topic: 'Chủ đề 6: Giải trí & Hoạt động', question: '你喜欢看电影吗？你常和谁一起去电影院？', pinyin: 'Nǐ xǐhuan kàn diànyǐng ma? Nǐ cháng hé shéi yìqǐ qù diànyǐngyuàn?', meaning: 'Bạn có thích xem phim không? Bạn thường cùng ai đi rạp chiếu phim?', sampleHanzi: '我喜欢看电影，星期天我常和同学一起去电影院。', samplePinyin: 'Wǒ xǐhuan kàn diànyǐng, xīngqītiān wǒ cháng hé tóngxué yìqǐ qù diànyǐngyuàn.', sampleMeaning: 'Tôi thích xem phim, Chủ nhật tôi thường cùng bạn học đi rạp chiếu phim.', vocab: 'Từ gợi ý: 电影 (phim), 电影院 (rạp chiếu phim), 好看 (hay/đẹp)' },
+            { id: 'sp_12', topicIdx: 5, topic: 'Chủ đề 6: Giải trí & Hoạt động', question: '晚上在家你喜欢听歌还是看电视？', pinyin: 'Wǎnshang zài jiā nǐ xǐhuan tīng gē háishi kàn diànshì?', meaning: 'Buổi tối ở nhà bạn thích nghe nhạc hay xem ti vi?', sampleHanzi: '晚上我喜欢听歌，中文歌很好听。', samplePinyin: 'Wǎnshang wǒ xǐhuan tīng gē, Zhōngwén gē hěn hǎotīng.', sampleMeaning: 'Buổi tối tôi thích nghe nhạc, nhạc tiếng Trung rất hay.', vocab: 'Từ gợi ý: 听歌 (nghe nhạc), 好听 (hay - âm thanh), 看电视 (xem ti vi)' },
+            { id: 'sp_13', topicIdx: 6, topic: 'Chủ đề 7: Mua sắm & Giá cả', question: '你常去商店或超市买什么东西？', pinyin: 'Nǐ cháng qù shāngdiàn huò chāoshì mǎi shénme dōngxi?', meaning: 'Bạn thường đi cửa hàng hoặc siêu thị mua đồ gì?', sampleHanzi: '我常去超市买水果、面包和牛奶，超市的东西很便宜。', samplePinyin: 'Wǒ cháng qù chāoshì mǎi shuǐguǒ, miànbāo hé niúnǎi, chāoshì de dōngxi hěn piányi.', sampleMeaning: 'Tôi thường đi siêu thị mua hoa quả, bánh mì và sữa, đồ ở siêu thị rất rẻ.', vocab: 'Từ gợi ý: 商店 (cửa hàng), 超市 (siêu thị), 便宜 (rẻ), 贵 (đắt)' },
+            { id: 'sp_14', topicIdx: 6, topic: 'Chủ đề 7: Mua sắm & Giá cả', question: '你的手机好看吗？你喜欢买什么东西？', pinyin: 'Nǐ de shǒujī hǎokàn ma? Nǐ xǐhuan mǎi shénme dōngxi?', meaning: 'Điện thoại của bạn có đẹp không? Bạn thích mua đồ gì?', sampleHanzi: '我的手机很好看，也不太贵。我喜欢去书店买书。', samplePinyin: 'Wǒ de shǒujī hěn hǎokàn, yě bú tài guì. Wǒ xǐhuan qù shūdiàn mǎi shū.', sampleMeaning: 'Điện thoại của tôi rất đẹp và cũng không quá đắt. Tôi thích đi hiệu sách mua sách.', vocab: 'Từ gợi ý: 手机 (điện thoại), 杯子 (cái cốc), 多少钱 (bao nhiêu tiền)' },
+            { id: 'sp_15', topicIdx: 7, topic: 'Chủ đề 8: Thời tiết & Cảm xúc', question: '今天天气怎么样？冷不冷？热不热？', pinyin: 'Jīntiān tiānqì zěnmeyàng? Lěng bù lěng? Rè bú rè?', meaning: 'Hôm nay thời tiết thế nào? Có lạnh không? Có nóng không?', sampleHanzi: '今天天气很好，不冷也不热，我很高兴。', samplePinyin: 'Jīntiān tiānqì hěn hǎo, bù lěng yě bú rè, wǒ hěn gāoxìng.', sampleMeaning: 'Hôm nay thời tiết rất đẹp, không lạnh cũng không nóng, tôi rất vui.', vocab: 'Từ gợi ý: 天气 (thời tiết), 怎么样 (thế nào), 冷 (lạnh), 热 (nóng)' },
+            { id: 'sp_16', topicIdx: 7, topic: 'Chủ đề 8: Thời tiết & Cảm xúc', question: '下雨的时候，你喜欢做什么？', pinyin: 'Xiàyǔ de shíhou, nǐ xǐhuan zuò shénme?', meaning: 'Khi trời mưa, bạn thích làm gì?', sampleHanzi: '下雨的时候，外边很冷，我喜欢在家喝热茶、看书。', samplePinyin: 'Xiàyǔ de shíhou, wàibian hěn lěng, wǒ xǐhuan zài jiā hē rè chá, kàn shū.', sampleMeaning: 'Khi trời mưa, bên ngoài rất lạnh, tôi thích ở nhà uống trà nóng và đọc sách.', vocab: 'Từ gợi ý: 下雨 (mưa), 外边 (bên ngoài)' },
+            { id: 'sp_17', topicIdx: 8, topic: 'Chủ đề 9: Phương tiện & Địa điểm', question: '你每天怎么去学校或公司？', pinyin: 'Nǐ měitiān zěnme qù xuéxiào huò gōngsī?', meaning: 'Mỗi ngày bạn đi đến trường hoặc công ty bằng cách nào?', sampleHanzi: '我家离学校很近，有时候我坐出租车去学校。', samplePinyin: 'Wǒ jiā lí xuéxiào hěn jìn, yǒushíhou wǒ zuò chūzūchē qù xuéxiào.', sampleMeaning: 'Nhà tôi gần trường, thỉnh thoảng tôi đi taxi đến trường.', vocab: 'Từ gợi ý: 怎么去 (đi bằng cách nào), 坐出租车 (đi taxi), 开车 (lái xe)' },
+            { id: 'sp_18', topicIdx: 8, topic: 'Chủ đề 9: Phương tiện & Địa điểm', question: '明年你想去哪里？你想坐火车去中国吗？', pinyin: 'Míngnián nǐ xiǎng qù nǎlǐ? Nǐ xiǎng zuò huǒchē qù Zhōngguó ma?', meaning: 'Năm sau bạn muốn đi đâu? Bạn muốn đi tàu hỏa đến Trung Quốc không?', sampleHanzi: '明年我想去中国学习汉语，我想坐飞机或者火车去。', samplePinyin: 'Míngnián wǒ xiǎng qù Zhōngguó xuéxí Hànyǔ, wǒ xiǎng zuò fēijī huòzhě huǒchē qù.', sampleMeaning: 'Năm sau tôi muốn đi Trung Quốc học tiếng Hán, tôi muốn đi máy bay hoặc tàu hỏa.', vocab: 'Từ gợi ý: 明年 (năm sau), 坐火车 (đi tàu hỏa), 住 (sống/ở)' },
+            { id: 'sp_19', topicIdx: 9, topic: 'Chủ đề 10: Giao tiếp hằng ngày', question: '你今天忙吗？晚上有时间给家人打电话吗？', pinyin: 'Nǐ jīntiān máng ma? Wǎnshang yǒu shíjiān gěi jiārén dǎ diànhuà ma?', meaning: 'Hôm nay bạn bận không? Buổi tối có thời gian gọi điện cho người nhà không?', sampleHanzi: '我今天不太忙，晚上我有时间给爸爸妈妈打电话。', samplePinyin: 'Wǒ jīntiān bú tài máng, wǎnshang wǒ yǒu shíjiān gěi bàba māma dǎ diànhuà.', sampleMeaning: 'Hôm nay tôi không quá bận, buổi tối tôi có thời gian gọi điện cho bố mẹ.', vocab: 'Từ gợi ý: 忙 (bận), 时间 (thời gian), 打电话 (gọi điện thoại)' },
+            { id: 'sp_20', topicIdx: 9, topic: 'Chủ đề 10: Giao tiếp hằng ngày', question: '别人对你说“谢谢”或“对不起”时，你怎么回答？', pinyin: 'Biérén duì nǐ shuō "xièxie" huò "duìbuqǐ" shí, nǐ zěnme huídá?', meaning: 'Khi người khác nói "Cảm ơn" hoặc "Xin lỗi" với bạn, bạn trả lời thế nào?', sampleHanzi: '别人说“谢谢”时，我说“不客气”；别人说“对不起”时，我说“没关系”。', samplePinyin: 'Biérén shuō "xièxie" shí, wǒ shuō "bú kèqi"; biérén shuō "duìbuqǐ" shí, wǒ shuō "méiguānxi".', sampleMeaning: 'Khi người khác nói "Cảm ơn", tôi nói "Không có gì"; khi người khác nói "Xin lỗi", tôi nói "Không sao".', vocab: 'Từ gợi ý: 不客气 (không có gì), 没关系 (không sao), 再见 (tạm biệt)' }
+        ];
+
+        // =========================================================================
         // 3. QUẢN LÝ TRẠNG THÁI, LOCALSTORAGE & ĐỒNG BỘ GIÁO VIÊN
         // =========================================================================
         const STORAGE_KEY = 'hsk1_master_students_v2';
@@ -1173,25 +1595,38 @@ function doGet(e) {
         const FREE_PINYIN_HINTS = 5;
 
         let currentStudentId = null;
-        let studentsData = {}; // Dữ liệu học viên làm trên máy này
-        let teacherImportedData = {}; // Dữ liệu học viên giáo viên import qua Mã Nộp Bài / CSV
-        let teacherCloudData = {}; // Dữ liệu được tải từ Google Sheets sau khi giáo viên xác thực
+        let studentsData = {};
+        let teacherImportedData = {};
+        let teacherCloudData = {};
         let teacherPassSession = null;
         let teacherUnlocked = false;
         let syncTimer = null;
 
-        // Trạng thái bài tập hiện tại
         let ordIndex = 0;
         let ordShuffledWords = [];
         let dicIndex = 0;
 
+        // Trạng thái Đọc & Nói
+        let readingSubMode = 'sentences'; // 'sentences' | 'passages'
+        let readSentIndex = 0;
+        let readPassIndex = 0;
+        let spkIndex = 0;
+
+        // Trạng thái Ghi âm (MediaRecorder)
+        let activeMediaRecorder = null;
+        let activeRecordingContext = null; // 'reading' | 'speaking'
+        let recordedChunks = [];
+        let recordingStartTime = 0;
+        let recordingTimerInterval = null;
+
         document.addEventListener('DOMContentLoaded', () => {
             loadFromLocalStorage();
             populateDropdowns();
+            populateReadingAndSpeakingDropdowns();
             renderPronunciationBoards();
             renderSavedStudentsList();
             checkWebhookVisibility();
-            // Nếu thiết bị mất mạng rồi kết nối lại, tự gửi lại hồ sơ học viên đang mở.
+
             window.addEventListener('online', () => queueGoogleSheetsSync());
             const studentWebhookInput = document.getElementById('student-webhook-url');
             if (studentWebhookInput) studentWebhookInput.value = localStorage.getItem(TEACHER_WEBHOOK_KEY) || '';
@@ -1203,7 +1638,6 @@ function doGet(e) {
                 openLoginModal();
             }
 
-            // Phím tắt Enter cho cả 2 phần
             document.getElementById('ord-user-input').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -1230,15 +1664,22 @@ function doGet(e) {
                 student.progress.dictationIndex = dicIndex;
                 saveToLocalStorage();
             });
-
             document.getElementById('dic-user-input').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     checkDictationAnswer();
                 }
             });
+            document.getElementById('spk-user-note').addEventListener('input', () => {
+                if (!currentStudentId || !studentsData[currentStudentId]) return;
+                const student = studentsData[currentStudentId];
+                const q = SPEAKING_QUESTIONS[spkIndex];
+                student.speaking = student.speaking || {};
+                student.speaking[q.id] = student.speaking[q.id] || {};
+                student.speaking[q.id].note = document.getElementById('spk-user-note').value;
+                saveToLocalStorage();
+            });
 
-            // Phím tắt Alt + R để phát lại âm thanh nghe nhanh
             document.addEventListener('keydown', (e) => {
                 if (e.altKey && (e.key === 'r' || e.key === 'R')) {
                     const dicSec = document.getElementById('section-dictation');
@@ -1264,6 +1705,8 @@ function doGet(e) {
                     student.pinyinReveals = student.pinyinReveals || {};
                     student.ordering = student.ordering || {};
                     student.dictation = student.dictation || {};
+                    student.reading = student.reading || {};
+                    student.speaking = student.speaking || {};
                     student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
                     student.drafts = student.drafts || { ordering: {}, dictation: {} };
                     student.drafts.ordering = student.drafts.ordering || {};
@@ -1289,7 +1732,8 @@ function doGet(e) {
                 updateBadgesAndSummary();
                 queueGoogleSheetsSync();
             } catch (e) {
-                console.error('Lỗi lưu dữ liệu:', e);
+                console.error('Lỗi lưu dữ liệu (có thể đầy bộ nhớ trình duyệt do nhiều file ghi âm):', e);
+                showToast('Bộ nhớ trình duyệt gần đầy, hãy tải file ghi âm hoặc gửi lên Google Sheets!', 'error');
             }
         }
 
@@ -1318,7 +1762,7 @@ function doGet(e) {
 
         function queueGoogleSheetsSync() {
             if (syncTimer) clearTimeout(syncTimer);
-            syncTimer = setTimeout(() => { syncStudentToGoogleSheets(true); }, 700);
+            syncTimer = setTimeout(() => { syncStudentToGoogleSheets(true); }, 800);
         }
 
         async function syncStudentToGoogleSheets(silent = false) {
@@ -1330,14 +1774,13 @@ function doGet(e) {
             }
             const student = studentsData[currentStudentId];
             try {
-                // no-cors + text/plain tránh yêu cầu preflight của Apps Script Web App.
                 await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
                     cache: 'no-store',
                     body: JSON.stringify({action: 'saveStudent', student})
                 });
-                if (!silent) showToast('Đã gửi yêu cầu đồng bộ bài làm lên Google Sheets.', 'success');
+                if (!silent) showToast('Đã gửi đồng bộ bài làm & bản ghi âm lên Google Sheets.', 'success');
                 return true;
             } catch (err) {
                 console.error('Google Sheets sync error:', err);
@@ -1397,7 +1840,7 @@ function doGet(e) {
         }
 
         // =========================================================================
-        // 4. QUẢN LÝ HỒ SƠ HỌC VIÊN (LOGIN / SWITCH)
+        // 4. QUẢN LÝ HỒ SƠ HỌC VIÊN
         // =========================================================================
         document.getElementById('new-student-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -1412,6 +1855,8 @@ function doGet(e) {
                 updatedAt: new Date().toLocaleString('vi-VN'),
                 ordering: {},
                 dictation: {},
+                reading: {},
+                speaking: {},
                 coins: 0,
                 hintsUsed: 0,
                 pinyinReveals: {},
@@ -1439,12 +1884,14 @@ function doGet(e) {
                 const s = studentsData[id];
                 const ordDone = Object.values(s.ordering || {}).filter(x => x.isCorrect).length;
                 const dicDone = Object.values(s.dictation || {}).filter(x => x.isCorrect).length;
+                const readDone = Object.values(s.reading || {}).filter(x => x.audioData).length;
+                const spkDone = Object.values(s.speaking || {}).filter(x => x.audioData).length;
                 return `
                     <div onclick="selectStudent('${id}')"
                         class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-brand-red hover:bg-orange-50/50 cursor-pointer transition">
                         <div>
                             <div class="font-bold text-sm text-slate-800">${escapeHtml(s.name)}</div>
-                            <div class="text-xs text-slate-500">Sắp xếp: ${ordDone}/${ORDERING_QUESTIONS.length} • Nghe: ${dicDone}/${DICTATION_QUESTIONS.length}</div>
+                            <div class="text-xs text-slate-500">Sắp xếp: ${ordDone}/100 • Nghe: ${dicDone}/100 • Đọc: ${readDone}/30 • Nói: ${spkDone}/20</div>
                         </div>
                         <span class="text-xs font-semibold text-brand-red bg-brand-redLight px-2.5 py-1 rounded-lg">Tiếp tục &rarr;</span>
                     </div>
@@ -1461,8 +1908,13 @@ function doGet(e) {
             
             student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
             student.drafts = student.drafts || { ordering: {}, dictation: {} };
+            student.reading = student.reading || {};
+            student.speaking = student.speaking || {};
+
             initOrderingQuestion(Math.min(Math.max(Number(student.progress.orderingIndex || 0), 0), ORDERING_QUESTIONS.length - 1));
             initDictationQuestion(Math.min(Math.max(Number(student.progress.dictationIndex || 0), 0), DICTATION_QUESTIONS.length - 1));
+            renderReadingItem();
+            initSpeakingQuestion(0);
             updateBadgesAndSummary();
             queueGoogleSheetsSync();
         }
@@ -1476,10 +1928,14 @@ function doGet(e) {
         // 5. ĐIỀU HƯỚNG TAB & BỘ LỌC BÀI HỌC
         // =========================================================================
         function switchTab(tabName) {
-            const sections = ['ordering', 'dictation', 'pronunciation', 'summary', 'teacher'];
+            if (activeMediaRecorder && activeMediaRecorder.state === 'recording') {
+                stopActiveRecording();
+            }
+            const sections = ['ordering', 'dictation', 'reading', 'speaking', 'pronunciation', 'summary', 'teacher'];
             sections.forEach(sec => {
                 const el = document.getElementById(`section-${sec}`);
                 const btn = document.getElementById(`tab-btn-${sec}`);
+                if (!el || !btn) return;
                 if (sec === tabName) {
                     el.classList.remove('hidden');
                     btn.classList.add('border-brand-red', 'text-brand-red');
@@ -1495,6 +1951,10 @@ function doGet(e) {
                 updateBadgesAndSummary();
             } else if (tabName === 'teacher' && teacherUnlocked) {
                 renderTeacherDashboard();
+            } else if (tabName === 'reading') {
+                renderReadingItem();
+            } else if (tabName === 'speaking') {
+                initSpeakingQuestion(spkIndex);
             }
         }
 
@@ -1514,25 +1974,15 @@ function doGet(e) {
         }
 
         function filterOrderingByUnit(unitIdx) {
-            if (unitIdx === 'all') {
-                initOrderingQuestion(0);
-            } else {
-                const startIdx = parseInt(unitIdx, 10) * 10;
-                initOrderingQuestion(startIdx);
-            }
+            initOrderingQuestion(unitIdx === 'all' ? 0 : parseInt(unitIdx, 10) * 10);
         }
 
         function filterDictationByUnit(unitIdx) {
-            if (unitIdx === 'all') {
-                initDictationQuestion(0);
-            } else {
-                const startIdx = parseInt(unitIdx, 10) * 10;
-                initDictationQuestion(startIdx);
-            }
+            initDictationQuestion(unitIdx === 'all' ? 0 : parseInt(unitIdx, 10) * 10);
         }
 
         // =========================================================================
-        // 6. PHẦN 1: SẮP XẾP CÂU (TỰ GÕ CÂU TRẢ LỜI + PHÂN TÍCH TỪNG KÝ TỰ)
+        // 6. PHẦN 1: SẮP XẾP CÂU
         // =========================================================================
         function shuffleArray(arr) {
             const copy = [...arr];
@@ -1554,12 +2004,8 @@ function doGet(e) {
             document.getElementById('ord-current-num').textContent = ordIndex + 1;
             document.getElementById('ord-grammar-tag').textContent = q.unit;
             document.getElementById('ord-question-select').value = ordIndex;
-            
-            // Đồng bộ dropdown chọn bài (mỗi 10 câu 1 bài)
-            const unitBucket = Math.floor(ordIndex / 10);
-            document.getElementById('ord-unit-select').value = String(unitBucket);
+            document.getElementById('ord-unit-select').value = String(Math.floor(ordIndex / 10));
 
-            // Reset input & feedback
             const inputEl = document.getElementById('ord-user-input');
             const activeStudent = studentsData[currentStudentId];
             if (activeStudent) {
@@ -1571,9 +2017,7 @@ function doGet(e) {
             inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-slate-300 focus:outline-none focus:border-brand-red focus:ring-4 focus:ring-red-500/10 transition';
             document.getElementById('ord-feedback').classList.add('hidden');
 
-            // Trạng thái đã làm
-            const student = studentsData[currentStudentId];
-            const savedRecord = student?.ordering?.[q.id];
+            const savedRecord = activeStudent?.ordering?.[q.id];
             const statusPill = document.getElementById('ord-status-pill');
             if (savedRecord) {
                 statusPill.classList.remove('hidden');
@@ -1609,7 +2053,7 @@ function doGet(e) {
                         <span class="chinese-text text-lg sm:text-xl font-bold leading-snug">${escapeHtml(word.hanzi)}</span>
                         ${isRevealed
                             ? `<span class="mt-1 text-[11px] font-semibold text-brand-teal">${escapeHtml(word.pinyin)}</span>`
-                            : `<button type="button" onclick="revealOrderingPinyin(${word.key})" class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md px-2 py-1">Hiện Pinyin</button>`}
+                            : `<button type="button" onclick="revealOrderingPinyin(${word.key})" class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md px-2 py-1 cursor-pointer">Hiện Pinyin</button>`}
                     </div>`;
             }).join('');
         }
@@ -1641,8 +2085,7 @@ function doGet(e) {
         }
 
         function reshuffleCurrentOrdering() {
-            const q = ORDERING_QUESTIONS[ordIndex];
-            ordShuffledWords = shuffleArray(q.words);
+            ordShuffledWords = shuffleArray(ORDERING_QUESTIONS[ordIndex].words);
             renderOrderingQuestion();
         }
 
@@ -1652,7 +2095,6 @@ function doGet(e) {
             if (currentStudentId && studentsData[currentStudentId]) {
                 const q = ORDERING_QUESTIONS[ordIndex];
                 studentsData[currentStudentId].drafts = studentsData[currentStudentId].drafts || { ordering: {}, dictation: {} };
-                studentsData[currentStudentId].drafts.ordering = studentsData[currentStudentId].drafts.ordering || {};
                 delete studentsData[currentStudentId].drafts.ordering[q.id];
                 saveToLocalStorage();
             }
@@ -1700,7 +2142,6 @@ function doGet(e) {
             let coinsAwarded = false;
             let alreadyCorrect = false;
 
-            // Lưu tiến độ; chỉ cộng 100 xu ở lần đầu trả lời đúng câu này.
             if (currentStudentId && studentsData[currentStudentId]) {
                 const student = studentsData[currentStudentId];
                 const previous = student.ordering[q.id];
@@ -1723,9 +2164,7 @@ function doGet(e) {
                 if (counter) counter.textContent = `${freeRemaining} lượt miễn phí còn lại · sau đó ${PINYIN_HINT_COST} xu/lượt · Ví: ${Number(student.coins || 0)} xu`;
             }
 
-            // Hiển thị đối chiếu từng chữ Hán
             document.getElementById('ord-char-diff').innerHTML = buildCharacterDiffHtml(cleanUser, cleanTarget);
-
             const feedbackEl = document.getElementById('ord-feedback');
             const titleEl = document.getElementById('ord-feedback-title');
 
@@ -1739,9 +2178,7 @@ function doGet(e) {
                 inputEl.className = 'w-full px-4 py-3.5 text-lg sm:text-xl chinese-text rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 focus:outline-none transition';
                 feedbackEl.className = 'mt-6 p-5 rounded-2xl border border-emerald-200 bg-emerald-50/80 transition-all';
                 titleEl.className = 'font-bold text-base flex items-center gap-2 text-emerald-700';
-                const rewardText = coinsAwarded
-                    ? `+${COINS_PER_CORRECT_SENTENCE} xu!`
-                    : (alreadyCorrect ? 'Câu này đã được thưởng xu trước đó.' : '');
+                const rewardText = coinsAwarded ? `+${COINS_PER_CORRECT_SENTENCE} xu!` : (alreadyCorrect ? 'Câu này đã được thưởng xu trước đó.' : '');
                 titleEl.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i> Chính xác! ${rewardText}`;
                 speakChineseText(q.answer, 1.0);
             } else {
@@ -1761,27 +2198,13 @@ function doGet(e) {
                 : '<i class="fa-solid fa-xmark mr-1"></i>Cần luyện lại';
         }
 
-        function speakCurrentOrdering() {
-            const q = ORDERING_QUESTIONS[ordIndex];
-            speakChineseText(q.answer, 1.0);
-        }
-
-        function jumpToOrdering(val) {
-            initOrderingQuestion(parseInt(val, 10));
-        }
-
-        function prevOrdering() {
-            const prev = (ordIndex - 1 + ORDERING_QUESTIONS.length) % ORDERING_QUESTIONS.length;
-            initOrderingQuestion(prev);
-        }
-
-        function nextOrdering() {
-            const next = (ordIndex + 1) % ORDERING_QUESTIONS.length;
-            initOrderingQuestion(next);
-        }
+        function speakCurrentOrdering() { speakChineseText(ORDERING_QUESTIONS[ordIndex].answer, 1.0); }
+        function jumpToOrdering(val) { initOrderingQuestion(parseInt(val, 10)); }
+        function prevOrdering() { initOrderingQuestion((ordIndex - 1 + ORDERING_QUESTIONS.length) % ORDERING_QUESTIONS.length); }
+        function nextOrdering() { initOrderingQuestion((ordIndex + 1) % ORDERING_QUESTIONS.length); }
 
         // =========================================================================
-        // 7. PHẦN 2: LUYỆN NGHE CHÉP CHÍNH TẢ (100 CÂU)
+        // 7. PHẦN 2: LUYỆN NGHE CHÉP CHÍNH TẢ
         // =========================================================================
         function initDictationQuestion(index) {
             dicIndex = index;
@@ -1790,9 +2213,7 @@ function doGet(e) {
             document.getElementById('dic-current-num').textContent = dicIndex + 1;
             document.getElementById('dic-topic-tag').textContent = q.topic;
             document.getElementById('dic-question-select').value = dicIndex;
-
-            const unitBucket = Math.floor(dicIndex / 10);
-            document.getElementById('dic-unit-select').value = String(unitBucket);
+            document.getElementById('dic-unit-select').value = String(Math.floor(dicIndex / 10));
 
             const activeStudent = studentsData[currentStudentId];
             if (activeStudent) {
@@ -1807,16 +2228,13 @@ function doGet(e) {
             if (currentStudentId && studentsData[currentStudentId]) saveToLocalStorage();
         }
 
-        function toggleDictationHint() {
-            document.getElementById('dic-hint-box').classList.toggle('hidden');
-        }
+        function toggleDictationHint() { document.getElementById('dic-hint-box').classList.toggle('hidden'); }
 
         function clearDictationInput() {
             document.getElementById('dic-user-input').value = '';
             if (currentStudentId && studentsData[currentStudentId]) {
                 const q = DICTATION_QUESTIONS[dicIndex];
                 studentsData[currentStudentId].drafts = studentsData[currentStudentId].drafts || { ordering: {}, dictation: {} };
-                studentsData[currentStudentId].drafts.dictation = studentsData[currentStudentId].drafts.dictation || {};
                 delete studentsData[currentStudentId].drafts.dictation[q.id];
                 saveToLocalStorage();
             }
@@ -1828,10 +2246,7 @@ function doGet(e) {
             const q = DICTATION_QUESTIONS[dicIndex];
             const btnNormal = document.getElementById('btn-play-normal');
             if (rate === 1.0) btnNormal.classList.add('speaking-ring');
-            
-            speakChineseText(q.hanzi, rate, () => {
-                btnNormal.classList.remove('speaking-ring');
-            });
+            speakChineseText(q.hanzi, rate, () => btnNormal.classList.remove('speaking-ring'));
         }
 
         function speakChineseText(text, rate = 1.0, onEndCallback = null) {
@@ -1839,38 +2254,20 @@ function doGet(e) {
                 showToast('Trình duyệt không hỗ trợ đọc văn bản tự động.', 'error');
                 return;
             }
-
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'zh-CN';
             utterance.rate = rate;
-
             const voices = window.speechSynthesis.getVoices();
             const zhVoice = voices.find(v => v.lang.includes('zh-CN') || v.lang.includes('zh_CN') || v.lang === 'zh');
-            if (zhVoice) {
-                utterance.voice = zhVoice;
-            }
-
+            if (zhVoice) utterance.voice = zhVoice;
             utterance.onend = () => { if (onEndCallback) onEndCallback(); };
             utterance.onerror = () => { if (onEndCallback) onEndCallback(); };
-
             window.speechSynthesis.speak(utterance);
         }
 
         function normalizeChinese(str) {
-            return str
-                .replace(/[\s\.,\/#!$%\^&\*;:{}=\-_`~()？。，！、；：“”‘’（）【】《》]/g, '')
-                .trim();
-        }
-
-        function normalizePinyin(str) {
-            return String(str || '')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/ü/g, 'u')
-                .replace(/[0-5]/g, '')
-                .replace(/[^a-z]/g, '');
+            return str.replace(/[\s\.,\/#!$%\^&\*;:{}=\-_`~()？。，！、；：“”‘’（）【】《》]/g, '').trim();
         }
 
         function checkDictationAnswer() {
@@ -1888,10 +2285,7 @@ function doGet(e) {
             const isCorrect = (cleanUser === cleanTarget);
 
             if (currentStudentId && studentsData[currentStudentId]) {
-                studentsData[currentStudentId].dictation[q.id] = {
-                    isCorrect: isCorrect,
-                    userInput: rawInput.trim()
-                };
+                studentsData[currentStudentId].dictation[q.id] = { isCorrect, userInput: rawInput.trim() };
                 const student = studentsData[currentStudentId];
                 student.progress = student.progress || { orderingIndex: 0, dictationIndex: 0 };
                 if (isCorrect) student.progress.dictationIndex = Math.min(dicIndex + 1, DICTATION_QUESTIONS.length - 1);
@@ -1899,7 +2293,6 @@ function doGet(e) {
             }
 
             document.getElementById('dic-char-diff').innerHTML = buildCharacterDiffHtml(cleanUser, cleanTarget);
-
             const feedbackEl = document.getElementById('dic-feedback');
             const titleEl = document.getElementById('dic-feedback-title');
             feedbackEl.classList.remove('hidden');
@@ -1920,47 +2313,368 @@ function doGet(e) {
             }
         }
 
-        function jumpToDictation(val) {
-            initDictationQuestion(parseInt(val, 10));
+        function jumpToDictation(val) { initDictationQuestion(parseInt(val, 10)); }
+        function prevDictation() { initDictationQuestion((dicIndex - 1 + DICTATION_QUESTIONS.length) % DICTATION_QUESTIONS.length); }
+        function nextDictation() { initDictationQuestion((dicIndex + 1) % DICTATION_QUESTIONS.length); }
+
+        // =========================================================================
+        // 8. PHẦN 3 & 4: LUYỆN ĐỌC (CÂU & ĐOẠN VĂN) + LUYỆN NÓI + BỘ GHI ÂM
+        // =========================================================================
+        function populateReadingAndSpeakingDropdowns() {
+            const spkSelect = document.getElementById('spk-question-select');
+            if (spkSelect) {
+                spkSelect.innerHTML = SPEAKING_QUESTIONS.map((q, idx) =>
+                    `<option value="${idx}">Câu ${idx + 1}: ${q.topic.split(':')[1]?.trim() || q.topic}</option>`
+                ).join('');
+            }
+            document.getElementById('spk-total-num').textContent = SPEAKING_QUESTIONS.length;
         }
 
-        function prevDictation() {
-            const prev = (dicIndex - 1 + DICTATION_QUESTIONS.length) % DICTATION_QUESTIONS.length;
-            initDictationQuestion(prev);
+        function switchReadingSubMode(mode) {
+            if (activeMediaRecorder && activeMediaRecorder.state === 'recording') stopActiveRecording();
+            readingSubMode = mode;
+
+            const btnSent = document.getElementById('read-sub-sentences');
+            const btnPass = document.getElementById('read-sub-passages');
+            if (mode === 'sentences') {
+                btnSent.className = 'px-3.5 py-2 rounded-lg bg-brand-red text-white shadow-2xs transition cursor-pointer flex items-center gap-1.5';
+                btnPass.className = 'px-3.5 py-2 rounded-lg text-slate-600 hover:text-brand-red transition cursor-pointer flex items-center gap-1.5';
+            } else {
+                btnPass.className = 'px-3.5 py-2 rounded-lg bg-brand-red text-white shadow-2xs transition cursor-pointer flex items-center gap-1.5';
+                btnSent.className = 'px-3.5 py-2 rounded-lg text-slate-600 hover:text-brand-red transition cursor-pointer flex items-center gap-1.5';
+            }
+            renderReadingItem();
         }
 
-        function nextDictation() {
-            const next = (dicIndex + 1) % DICTATION_QUESTIONS.length;
-            initDictationQuestion(next);
+        function renderReadingItem() {
+            const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+            const currentIdx = readingSubMode === 'sentences' ? readSentIndex : readPassIndex;
+            const item = list[currentIdx];
+            if (!item) return;
+
+            // Populate topic & item dropdowns dynamically
+            const topicSelect = document.getElementById('read-topic-select');
+            const itemSelect = document.getElementById('read-item-select');
+            if (readingSubMode === 'sentences') {
+                topicSelect.innerHTML = `
+                    <option value="all">Tất cả 10 chủ đề (20 câu)</option>
+                    ${HSK1_V3_UNITS.map((u, i) => `<option value="${i}">Chủ đề ${i + 1}: ${u.split(':')[1].trim()}</option>`).join('')}
+                `;
+                topicSelect.value = String(item.topicIdx);
+                itemSelect.innerHTML = READING_SENTENCES.map((s, i) => `<option value="${i}">Câu đọc ${i + 1}</option>`).join('');
+            } else {
+                topicSelect.innerHTML = `
+                    <option value="all">Tất cả 10 bài đọc đoạn văn</option>
+                    ${READING_PASSAGES.map((p, i) => `<option value="${i}">${p.topic}</option>`).join('')}
+                `;
+                topicSelect.value = String(item.topicIdx);
+                itemSelect.innerHTML = READING_PASSAGES.map((p, i) => `<option value="${i}">Đoạn văn ${i + 1}</option>`).join('');
+            }
+            itemSelect.value = String(currentIdx);
+
+            document.getElementById('read-item-badge').textContent = readingSubMode === 'sentences'
+                ? `Câu đọc ${currentIdx + 1} / ${list.length}`
+                : `Đoạn văn ${currentIdx + 1} / ${list.length}`;
+            document.getElementById('read-item-topic').textContent = item.topic;
+
+            const hanziEl = document.getElementById('read-hanzi-display');
+            hanziEl.textContent = item.hanzi;
+            hanziEl.className = readingSubMode === 'sentences'
+                ? 'chinese-text text-2xl sm:text-3xl font-bold text-slate-900 leading-relaxed pt-1'
+                : 'chinese-text text-xl sm:text-2xl font-bold text-slate-900 leading-loose pt-1';
+
+            document.getElementById('read-pinyin-display').textContent = item.pinyin;
+            document.getElementById('read-meaning-display').textContent = 'Nghĩa: ' + item.meaning;
+            document.getElementById('read-support-box').classList.add('hidden');
+
+            // Load existing recording if any
+            const student = studentsData[currentStudentId];
+            const rec = student?.reading?.[item.id];
+            updateAudioPlayerUI('reading', item.id, rec);
+        }
+
+        function filterReadingByTopic(val) {
+            if (val === 'all') {
+                if (readingSubMode === 'sentences') readSentIndex = 0;
+                else readPassIndex = 0;
+            } else {
+                const idx = parseInt(val, 10);
+                if (readingSubMode === 'sentences') readSentIndex = idx * 2;
+                else readPassIndex = idx;
+            }
+            renderReadingItem();
+        }
+
+        function jumpToReadingItem(val) {
+            const idx = parseInt(val, 10);
+            if (readingSubMode === 'sentences') readSentIndex = idx;
+            else readPassIndex = idx;
+            renderReadingItem();
+        }
+
+        function prevReadingItem() {
+            const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+            if (readingSubMode === 'sentences') readSentIndex = (readSentIndex - 1 + list.length) % list.length;
+            else readPassIndex = (readPassIndex - 1 + list.length) % list.length;
+            renderReadingItem();
+        }
+
+        function nextReadingItem() {
+            const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+            if (readingSubMode === 'sentences') readSentIndex = (readSentIndex + 1) % list.length;
+            else readPassIndex = (readPassIndex + 1) % list.length;
+            renderReadingItem();
+        }
+
+        function toggleReadingPinyin() {
+            document.getElementById('read-support-box').classList.toggle('hidden');
+        }
+
+        function speakReadingText(rate = 1.0) {
+            const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+            const item = list[readingSubMode === 'sentences' ? readSentIndex : readPassIndex];
+            if (item) speakChineseText(item.hanzi, rate);
+        }
+
+        // --- Speaking Section ---
+        function initSpeakingQuestion(index) {
+            spkIndex = index;
+            const q = SPEAKING_QUESTIONS[spkIndex];
+            document.getElementById('spk-current-num').textContent = spkIndex + 1;
+            document.getElementById('spk-topic-tag').textContent = q.topic;
+            document.getElementById('spk-topic-select').value = String(q.topicIdx);
+            document.getElementById('spk-question-select').value = String(spkIndex);
+
+            document.getElementById('spk-question-hanzi').textContent = q.question;
+            document.getElementById('spk-question-pinyin').textContent = q.pinyin;
+            document.getElementById('spk-question-meaning').textContent = 'Câu hỏi: ' + q.meaning;
+
+            document.getElementById('spk-sample-hanzi').textContent = q.sampleHanzi;
+            document.getElementById('spk-sample-pinyin').textContent = q.samplePinyin;
+            document.getElementById('spk-sample-meaning').textContent = 'Dịch: ' + q.sampleMeaning;
+            document.getElementById('spk-vocab-tips').textContent = q.vocab;
+            document.getElementById('spk-hint-box').classList.add('hidden');
+
+            const student = studentsData[currentStudentId];
+            const rec = student?.speaking?.[q.id];
+            document.getElementById('spk-user-note').value = rec?.note || '';
+            updateAudioPlayerUI('speaking', q.id, rec);
+        }
+
+        function filterSpeakingByTopic(val) {
+            initSpeakingQuestion(val === 'all' ? 0 : parseInt(val, 10) * 2);
+        }
+        function jumpToSpeaking(val) { initSpeakingQuestion(parseInt(val, 10)); }
+        function prevSpeaking() { initSpeakingQuestion((spkIndex - 1 + SPEAKING_QUESTIONS.length) % SPEAKING_QUESTIONS.length); }
+        function nextSpeaking() { initSpeakingQuestion((spkIndex + 1) % SPEAKING_QUESTIONS.length); }
+        function toggleSpeakingHint() { document.getElementById('spk-hint-box').classList.toggle('hidden'); }
+        function speakSpeakingQuestion(rate = 1.0) { speakChineseText(SPEAKING_QUESTIONS[spkIndex].question, rate); }
+        function speakSpeakingSample() { speakChineseText(SPEAKING_QUESTIONS[spkIndex].sampleHanzi, 1.0); }
+
+        // --- Unified MediaRecorder Engine (Reading & Speaking) ---
+        async function toggleRecording(context) {
+            if (!currentStudentId || !studentsData[currentStudentId]) {
+                showToast('Vui lòng chọn tên học viên trước khi ghi âm!', 'error');
+                openLoginModal();
+                return;
+            }
+
+            if (activeMediaRecorder && activeMediaRecorder.state === 'recording') {
+                stopActiveRecording();
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('Trình duyệt của bạn không hỗ trợ micro ghi âm.', 'error');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                    ? 'audio/webm;codecs=opus'
+                    : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+
+                activeRecordingContext = context;
+                recordedChunks = [];
+                activeMediaRecorder = mimeType
+                    ? new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 24000 })
+                    : new MediaRecorder(stream);
+
+                activeMediaRecorder.ondataavailable = (e) => {
+                    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                activeMediaRecorder.onstop = () => {
+                    stream.getTracks().forEach(track => track.stop());
+                    clearInterval(recordingTimerInterval);
+                    const durationSec = Math.max(1, Math.round((Date.now() - recordingStartTime) / 1000));
+                    const blob = new Blob(recordedChunks, { type: activeMediaRecorder.mimeType || 'audio/webm' });
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64Audio = reader.result;
+                        saveRecordingToStudent(context, base64Audio, durationSec);
+                    };
+                    reader.readAsDataURL(blob);
+                    resetRecorderButtonUI(context);
+                };
+
+                activeMediaRecorder.start();
+                recordingStartTime = Date.now();
+                setRecordingButtonActiveUI(context);
+
+                recordingTimerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                    const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                    const secs = String(elapsed % 60).padStart(2, '0');
+                    const timerEl = document.getElementById(context === 'reading' ? 'read-rec-timer' : 'spk-rec-timer');
+                    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+                    // Giới hạn 60 giây mỗi lần ghi để tối ưu dung lượng lưu trữ & đồng bộ Google Sheets
+                    if (elapsed >= 60) {
+                        stopActiveRecording();
+                        showToast('Đã đạt giới hạn 60 giây mỗi bản ghi âm.', 'info');
+                    }
+                }, 250);
+            } catch (err) {
+                console.error('Lỗi truy cập micro:', err);
+                showToast('Không thể mở micro. Hãy cấp quyền Micro cho trình duyệt nhé!', 'error');
+            }
+        }
+
+        function stopActiveRecording() {
+            if (activeMediaRecorder && activeMediaRecorder.state === 'recording') {
+                activeMediaRecorder.stop();
+            }
+        }
+
+        function setRecordingButtonActiveUI(context) {
+            const btn = document.getElementById(context === 'reading' ? 'read-rec-btn' : 'spk-rec-btn');
+            if (!btn) return;
+            btn.className = 'relative recording-ring px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition cursor-pointer flex items-center gap-2';
+            btn.innerHTML = '<i class="fa-solid fa-stop text-rose-500"></i><span>Dừng & Lưu bản ghi</span>';
+        }
+
+        function resetRecorderButtonUI(context) {
+            const btn = document.getElementById(context === 'reading' ? 'read-rec-btn' : 'spk-rec-btn');
+            if (!btn) return;
+            btn.className = 'relative px-5 py-2.5 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition cursor-pointer flex items-center gap-2';
+            btn.innerHTML = context === 'reading'
+                ? '<i class="fa-solid fa-microphone"></i><span>Ghi âm lại</span>'
+                : '<i class="fa-solid fa-microphone"></i><span>Ghi âm lại câu trả lời</span>';
+        }
+
+        function saveRecordingToStudent(context, base64Audio, durationSec) {
+            const student = studentsData[currentStudentId];
+            if (!student) return;
+            const recordedAt = new Date().toLocaleString('vi-VN');
+
+            if (context === 'reading') {
+                const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+                const item = list[readingSubMode === 'sentences' ? readSentIndex : readPassIndex];
+                student.reading = student.reading || {};
+                student.reading[item.id] = {
+                    type: readingSubMode,
+                    audioData: base64Audio,
+                    duration: durationSec,
+                    recordedAt
+                };
+                updateAudioPlayerUI('reading', item.id, student.reading[item.id]);
+            } else {
+                const q = SPEAKING_QUESTIONS[spkIndex];
+                student.speaking = student.speaking || {};
+                student.speaking[q.id] = {
+                    ...(student.speaking[q.id] || {}),
+                    audioData: base64Audio,
+                    duration: durationSec,
+                    recordedAt,
+                    note: document.getElementById('spk-user-note').value.trim()
+                };
+                updateAudioPlayerUI('speaking', q.id, student.speaking[q.id]);
+            }
+
+            saveToLocalStorage();
+            showToast(`Đã lưu bản ghi âm (${durationSec}s)! Bạn có thể nghe lại ngay bên dưới.`, 'success');
+        }
+
+        function updateAudioPlayerUI(context, itemId, rec) {
+            const prefix = context === 'reading' ? 'read' : 'spk';
+            const wrap = document.getElementById(`${prefix}-audio-player-wrap`);
+            const player = document.getElementById(`${prefix}-audio-player`);
+            const meta = document.getElementById(`${prefix}-audio-meta`);
+            const dl = document.getElementById(`${prefix}-audio-download`);
+            const delBtn = document.getElementById(`${prefix}-del-rec-btn`);
+            const statusBadge = document.getElementById(`${prefix}-recorded-status`);
+            const timerEl = document.getElementById(`${prefix}-rec-timer`);
+
+            if (rec && rec.audioData) {
+                wrap.classList.remove('hidden');
+                delBtn.classList.remove('hidden');
+                statusBadge.classList.remove('hidden');
+                player.src = rec.audioData;
+                meta.textContent = `${rec.duration || 0}s • ${rec.recordedAt || ''}`;
+                dl.href = rec.audioData;
+                dl.download = `${context}_${itemId}.webm`;
+                if (timerEl) timerEl.textContent = `00:${String(rec.duration || 0).padStart(2, '0')}`;
+                resetRecorderButtonUI(context);
+            } else {
+                wrap.classList.add('hidden');
+                delBtn.classList.add('hidden');
+                statusBadge.classList.add('hidden');
+                player.removeAttribute('src');
+                if (timerEl) timerEl.textContent = '00:00';
+                const btn = document.getElementById(`${prefix}-rec-btn`);
+                if (btn) {
+                    btn.innerHTML = context === 'reading'
+                        ? '<i class="fa-solid fa-microphone"></i><span>Bắt đầu ghi âm</span>'
+                        : '<i class="fa-solid fa-microphone"></i><span>Bắt đầu ghi âm trả lời</span>';
+                }
+            }
+        }
+
+        function deleteCurrentRecording(context) {
+            const student = studentsData[currentStudentId];
+            if (!student) return;
+            if (context === 'reading') {
+                const list = readingSubMode === 'sentences' ? READING_SENTENCES : READING_PASSAGES;
+                const item = list[readingSubMode === 'sentences' ? readSentIndex : readPassIndex];
+                if (student.reading) delete student.reading[item.id];
+                updateAudioPlayerUI('reading', item.id, null);
+            } else {
+                const q = SPEAKING_QUESTIONS[spkIndex];
+                if (student.speaking && student.speaking[q.id]) {
+                    delete student.speaking[q.id].audioData;
+                    delete student.speaking[q.id].duration;
+                    delete student.speaking[q.id].recordedAt;
+                }
+                updateAudioPlayerUI('speaking', q.id, null);
+            }
+            saveToLocalStorage();
+            showToast('Đã xóa bản ghi âm.', 'info');
         }
 
         // =========================================================================
-        // 8. PHẦN 3: BẢNG TỔNG KẾT & TẠO MÃ NỘP BÀI (BASE64 SYNC TOKEN)
+        // 9. TỔNG KẾT & MÃ NỘP BÀI
         // =========================================================================
         function generateSubmissionToken(student) {
-            // Nén dữ liệu gọn nhẹ: lưu danh sách index câu đúng (1..100) và câu sai (1..100)
-            const ordRight = [];
-            const ordWrong = [];
+            const ordRight = [], ordWrong = [];
             ORDERING_QUESTIONS.forEach((q, idx) => {
                 const rec = student.ordering?.[q.id];
-                if (rec) {
-                    if (rec.isCorrect) ordRight.push(idx + 1);
-                    else ordWrong.push(idx + 1);
-                }
+                if (rec) (rec.isCorrect ? ordRight : ordWrong).push(idx + 1);
             });
 
-            const dicRight = [];
-            const dicWrong = [];
+            const dicRight = [], dicWrong = [];
             DICTATION_QUESTIONS.forEach((q, idx) => {
                 const rec = student.dictation?.[q.id];
-                if (rec) {
-                    if (rec.isCorrect) dicRight.push(idx + 1);
-                    else dicWrong.push(idx + 1);
-                }
+                if (rec) (rec.isCorrect ? dicRight : dicWrong).push(idx + 1);
             });
 
+            const readSentDone = READING_SENTENCES.map((q, i) => student.reading?.[q.id]?.audioData ? i + 1 : null).filter(Boolean);
+            const readPassDone = READING_PASSAGES.map((q, i) => student.reading?.[q.id]?.audioData ? i + 1 : null).filter(Boolean);
+            const spkDone = SPEAKING_QUESTIONS.map((q, i) => student.speaking?.[q.id]?.audioData ? i + 1 : null).filter(Boolean);
+
             const payload = {
-                v: 3,
+                v: 4,
                 id: student.id,
                 n: student.name,
                 t: student.updatedAt || new Date().toLocaleString('vi-VN'),
@@ -1969,41 +2683,36 @@ function doGet(e) {
                 or: ordRight,
                 ow: ordWrong,
                 dr: dicRight,
-                dw: dicWrong
+                dw: dicWrong,
+                rs: readSentDone,
+                rp: readPassDone,
+                sp: spkDone
             };
 
-            const jsonStr = JSON.stringify(payload);
-            // Encode UTF-8 sang Base64 an toàn
-            const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+            const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
             return 'HSK1_' + base64;
         }
 
         function decodeSubmissionToken(tokenStr) {
             const clean = tokenStr.trim().replace(/^HSK1_/, '');
-            const jsonStr = decodeURIComponent(escape(atob(clean)));
-            const payload = JSON.parse(jsonStr);
+            const payload = JSON.parse(decodeURIComponent(escape(atob(clean))));
             if (!payload || !payload.n) throw new Error('Mã không hợp lệ');
-            if (payload.v !== 3) throw new Error('Mã thuộc phiên bản bài tập cũ. Vui lòng tạo mã mới từ HSK 1 Master 3.0.');
+            if (payload.v !== 3 && payload.v !== 4) throw new Error('Mã thuộc phiên bản bài tập cũ.');
 
             const ordering = {};
-            (payload.or || []).forEach(num => {
-                const q = ORDERING_QUESTIONS[num - 1];
-                if (q) ordering[q.id] = { isCorrect: true, userAnswer: q.answer };
-            });
-            (payload.ow || []).forEach(num => {
-                const q = ORDERING_QUESTIONS[num - 1];
-                if (q) ordering[q.id] = { isCorrect: false, userAnswer: '(Làm sai)' };
-            });
+            (payload.or || []).forEach(num => { const q = ORDERING_QUESTIONS[num - 1]; if (q) ordering[q.id] = { isCorrect: true, userAnswer: q.answer }; });
+            (payload.ow || []).forEach(num => { const q = ORDERING_QUESTIONS[num - 1]; if (q) ordering[q.id] = { isCorrect: false, userAnswer: '(Làm sai)' }; });
 
             const dictation = {};
-            (payload.dr || []).forEach(num => {
-                const q = DICTATION_QUESTIONS[num - 1];
-                if (q) dictation[q.id] = { isCorrect: true, userInput: q.hanzi };
-            });
-            (payload.dw || []).forEach(num => {
-                const q = DICTATION_QUESTIONS[num - 1];
-                if (q) dictation[q.id] = { isCorrect: false, userInput: '(Nghe sai)' };
-            });
+            (payload.dr || []).forEach(num => { const q = DICTATION_QUESTIONS[num - 1]; if (q) dictation[q.id] = { isCorrect: true, userInput: q.hanzi }; });
+            (payload.dw || []).forEach(num => { const q = DICTATION_QUESTIONS[num - 1]; if (q) dictation[q.id] = { isCorrect: false, userInput: '(Nghe sai)' }; });
+
+            const reading = {};
+            (payload.rs || []).forEach(num => { const q = READING_SENTENCES[num - 1]; if (q) reading[q.id] = { type: 'sentences', tokenOnly: true }; });
+            (payload.rp || []).forEach(num => { const q = READING_PASSAGES[num - 1]; if (q) reading[q.id] = { type: 'passages', tokenOnly: true }; });
+
+            const speaking = {};
+            (payload.sp || []).forEach(num => { const q = SPEAKING_QUESTIONS[num - 1]; if (q) speaking[q.id] = { tokenOnly: true }; });
 
             return {
                 id: payload.id || ('imp_' + payload.n),
@@ -2011,6 +2720,8 @@ function doGet(e) {
                 updatedAt: payload.t || new Date().toLocaleString('vi-VN'),
                 ordering,
                 dictation,
+                reading,
+                speaking,
                 coins: Number(payload.c || 0),
                 hintsUsed: Number(payload.h || 0),
                 pinyinReveals: {},
@@ -2024,15 +2735,26 @@ function doGet(e) {
 
             const ordTotal = ORDERING_QUESTIONS.length;
             const dicTotal = DICTATION_QUESTIONS.length;
-            const totalAll = ordTotal + dicTotal;
+            const readSentDone = READING_SENTENCES.filter(q => student.reading?.[q.id]?.audioData).length;
+            const readPassDone = READING_PASSAGES.filter(q => student.reading?.[q.id]?.audioData).length;
+            const readDone = readSentDone + readPassDone;
+            const spkDone = SPEAKING_QUESTIONS.filter(q => student.speaking?.[q.id]?.audioData).length;
 
             const ordCorrect = ORDERING_QUESTIONS.filter(q => student.ordering?.[q.id]?.isCorrect).length;
             const dicCorrect = DICTATION_QUESTIONS.filter(q => student.dictation?.[q.id]?.isCorrect).length;
-            const totalCorrect = ordCorrect + dicCorrect;
-            const accuracyPct = Math.round((totalCorrect / totalAll) * 100);
+            const totalCorrectAll = ordCorrect + dicCorrect + readDone + spkDone;
+            const maxAll = ordTotal + dicTotal + 30 + 20;
+            const accuracyPct = Math.round((totalCorrectAll / maxAll) * 100);
 
             document.getElementById('badge-ordering').textContent = `${ordCorrect}/${ordTotal}`;
             document.getElementById('badge-dictation').textContent = `${dicCorrect}/${dicTotal}`;
+            document.getElementById('badge-reading').textContent = `${readDone}/30`;
+            document.getElementById('badge-speaking').textContent = `${spkDone}/20`;
+
+            const sentPill = document.getElementById('read-sent-count-pill');
+            const passPill = document.getElementById('read-pass-count-pill');
+            if (sentPill) sentPill.textContent = `${readSentDone}/20`;
+            if (passPill) passPill.textContent = `${readPassDone}/10`;
 
             document.getElementById('sum-student-name').textContent = student.name;
             document.getElementById('sum-last-updated').textContent = `Cập nhật lần cuối: ${student.updatedAt || 'Vừa xong'}`;
@@ -2045,21 +2767,23 @@ function doGet(e) {
             document.getElementById('sum-dic-total').textContent = dicTotal;
             document.getElementById('sum-dic-bar').style.width = `${(dicCorrect / dicTotal) * 100}%`;
 
-            document.getElementById('sum-accuracy').textContent = `${accuracyPct}%`;
-            document.getElementById('sum-coins').textContent = Number(student.coins || 0).toLocaleString('vi-VN');
-            document.getElementById('sum-total-done').textContent = `Đạt chuẩn ${totalCorrect}/${totalAll} câu toàn khóa`;
+            document.getElementById('sum-read-done').textContent = readDone;
+            document.getElementById('sum-read-breakdown').textContent = `Đọc câu: ${readSentDone}/20 • Đoạn văn: ${readPassDone}/10`;
+            document.getElementById('sum-spk-done').textContent = spkDone;
 
-            // Cập nhật Mã Nộp Bài
+            document.getElementById('sum-coins').textContent = Number(student.coins || 0).toLocaleString('vi-VN');
+            document.getElementById('sum-total-done').textContent = `Hoàn thành ${totalCorrectAll}/${maxAll} mục (${accuracyPct}%)`;
+
             document.getElementById('student-token-display').value = generateSubmissionToken(student);
 
             const rankEl = document.getElementById('sum-rank');
-            if (accuracyPct >= 90) {
+            if (accuracyPct >= 85) {
                 rankEl.textContent = 'Xuất sắc (Sẵn sàng thi)';
                 rankEl.className = 'text-xl font-extrabold text-emerald-600 mt-1';
-            } else if (accuracyPct >= 75) {
+            } else if (accuracyPct >= 65) {
                 rankEl.textContent = 'Khá giỏi (Đạt chuẩn)';
                 rankEl.className = 'text-xl font-extrabold text-brand-teal mt-1';
-            } else if (accuracyPct >= 40) {
+            } else if (accuracyPct >= 30) {
                 rankEl.textContent = 'Đang tiến bộ';
                 rankEl.className = 'text-xl font-extrabold text-amber-600 mt-1';
             } else {
@@ -2067,12 +2791,35 @@ function doGet(e) {
                 rankEl.className = 'text-xl font-extrabold text-slate-600 mt-1';
             }
 
-            // Ẩn toàn bộ câu hỏi, câu trả lời và đáp án ở trang kết quả.
-            // Chỉ hiển thị số liệu tổng hợp; giáo viên xem chi tiết trong Góc Giáo Viên.
-            const ordListEl = document.getElementById('sum-ord-list');
-            const dicListEl = document.getElementById('sum-dic-list');
-            if (ordListEl) ordListEl.textContent = 'Danh sách câu hỏi và đáp án được ẩn tại trang kết quả để bảo mật bài luyện tập. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
-            if (dicListEl) dicListEl.textContent = 'Nội dung câu nghe và đáp án được ẩn tại trang kết quả. Giáo viên có thể xem chi tiết trong Góc Giáo Viên.';
+            // Danh sách bản ghi âm của học viên để tự nghe lại
+            const recListEl = document.getElementById('sum-recordings-list');
+            const recItems = [];
+            READING_SENTENCES.forEach((q, i) => {
+                const r = student.reading?.[q.id];
+                if (r?.audioData) recItems.push({ label: `[Đọc câu #${i + 1}] ${q.hanzi}`, audioData: r.audioData, duration: r.duration });
+            });
+            READING_PASSAGES.forEach((q, i) => {
+                const r = student.reading?.[q.id];
+                if (r?.audioData) recItems.push({ label: `[Đọc đoạn văn #${i + 1}] ${q.topic}`, audioData: r.audioData, duration: r.duration });
+            });
+            SPEAKING_QUESTIONS.forEach((q, i) => {
+                const r = student.speaking?.[q.id];
+                if (r?.audioData) recItems.push({ label: `[Luyện nói #${i + 1}] ${q.question}`, audioData: r.audioData, duration: r.duration });
+            });
+
+            if (recItems.length === 0) {
+                recListEl.innerHTML = 'Chưa có bản ghi âm nào. Hãy vào tab <strong>3. Luyện đọc</strong> hoặc <strong>4. Luyện nói</strong> để ghi âm!';
+            } else {
+                recListEl.innerHTML = `<div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">${recItems.map(item => `
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-700 chinese-text truncate">${escapeHtml(item.label)}</span>
+                            <span class="text-slate-400 shrink-0 ml-2">${item.duration || 0}s</span>
+                        </div>
+                        <audio controls src="${item.audioData}" class="w-full h-8"></audio>
+                    </div>
+                `).join('')}</div>`;
+            }
         }
 
         function copyTextFallback(text) {
@@ -2086,8 +2833,7 @@ function doGet(e) {
 
         function copySubmissionToken() {
             if (!currentStudentId || !studentsData[currentStudentId]) return;
-            const token = generateSubmissionToken(studentsData[currentStudentId]);
-            copyTextFallback(token);
+            copyTextFallback(generateSubmissionToken(studentsData[currentStudentId]));
             showToast('Đã sao chép Mã Nộp Bài! Hãy gửi mã này cho giáo viên qua Zalo/Messenger.', 'success');
         }
 
@@ -2096,14 +2842,15 @@ function doGet(e) {
             const student = studentsData[currentStudentId];
             const ordCorrect = ORDERING_QUESTIONS.filter(q => student.ordering?.[q.id]?.isCorrect).length;
             const dicCorrect = DICTATION_QUESTIONS.filter(q => student.dictation?.[q.id]?.isCorrect).length;
-            const totalAll = ORDERING_QUESTIONS.length + DICTATION_QUESTIONS.length;
-            const pct = Math.round(((ordCorrect + dicCorrect) / totalAll) * 100);
+            const readDone = Object.values(student.reading || {}).filter(x => x.audioData).length;
+            const spkDone = Object.values(student.speaking || {}).filter(x => x.audioData).length;
 
             const summaryText = `📊 BÁO CÁO ÔN TẬP HSK 1 · 3.0\n` +
                 `👤 Học viên: ${student.name}\n` +
-                `🧩 Sắp xếp câu: ${ordCorrect}/${ORDERING_QUESTIONS.length} câu\n` +
-                `🎧 Luyện nghe chép: ${dicCorrect}/${DICTATION_QUESTIONS.length} câu\n` +
-                `🏆 Tổng kết: ${ordCorrect + dicCorrect}/${totalAll} (${pct}%)\n` +
+                `🧩 Sắp xếp câu: ${ordCorrect}/100 câu\n` +
+                `🎧 Luyện nghe chép: ${dicCorrect}/100 câu\n` +
+                `📖 Luyện đọc (ghi âm): ${readDone}/30 bài\n` +
+                `🎙️ Luyện nói (ghi âm): ${spkDone}/20 câu\n` +
                 `🪙 Xu: ${Number(student.coins || 0)}\n` +
                 `🕒 Cập nhật: ${student.updatedAt}`;
 
@@ -2114,28 +2861,35 @@ function doGet(e) {
         function exportSummaryCSV() {
             if (!currentStudentId || !studentsData[currentStudentId]) return;
             const student = studentsData[currentStudentId];
-
             const ordCorrect = ORDERING_QUESTIONS.filter(q => student.ordering?.[q.id]?.isCorrect).length;
             const dicCorrect = DICTATION_QUESTIONS.filter(q => student.dictation?.[q.id]?.isCorrect).length;
-            const totalAll = ORDERING_QUESTIONS.length + DICTATION_QUESTIONS.length;
-            const pct = Math.round(((ordCorrect + dicCorrect) / totalAll) * 100);
+            const readDone = Object.values(student.reading || {}).filter(x => x.audioData).length;
+            const spkDone = Object.values(student.speaking || {}).filter(x => x.audioData).length;
 
             let csvContent = '\uFEFF';
-            csvContent += 'Học viên,Thời gian cập nhật,Điểm Sắp xếp câu,Điểm Luyện nghe,Tổng điểm,Tỷ lệ hoàn thành (%)\n';
-            csvContent += `"${student.name}","${student.updatedAt}",${ordCorrect}/${ORDERING_QUESTIONS.length},${dicCorrect}/${DICTATION_QUESTIONS.length},${ordCorrect + dicCorrect}/${totalAll},${pct}%\n\n`;
+            csvContent += 'Học viên,Thời gian cập nhật,Điểm Sắp xếp câu,Điểm Luyện nghe,Luyện đọc (Ghi âm),Luyện nói (Ghi âm),Xu\n';
+            csvContent += `"${student.name}","${student.updatedAt}",${ordCorrect}/100,${dicCorrect}/100,${readDone}/30,${spkDone}/20,${Number(student.coins || 0)}\n\n`;
 
-            csvContent += 'Phần thi,STT,Nội dung chuẩn,Trạng thái,Câu trả lời của học viên\n';
+            csvContent += 'Phần thi,STT,Nội dung chuẩn,Trạng thái,Ghi chú / Câu trả lời\n';
             ORDERING_QUESTIONS.forEach((q, i) => {
                 const rec = student.ordering?.[q.id];
-                const status = rec ? (rec.isCorrect ? 'Đúng' : 'Sai') : 'Chưa làm';
-                const ans = rec ? rec.userAnswer : '';
-                csvContent += `"Sắp xếp câu",${i + 1},"${q.answer}","${status}","${ans}"\n`;
+                csvContent += `"Sắp xếp câu",${i + 1},"${q.answer}","${rec ? (rec.isCorrect ? 'Đúng' : 'Sai') : 'Chưa làm'}","${rec ? rec.userAnswer : ''}"\n`;
             });
             DICTATION_QUESTIONS.forEach((q, i) => {
                 const rec = student.dictation?.[q.id];
-                const status = rec ? (rec.isCorrect ? 'Đúng' : 'Sai') : 'Chưa làm';
-                const ans = rec ? rec.userInput : '';
-                csvContent += `"Luyện nghe chép",${i + 1},"${q.hanzi}","${status}","${ans}"\n`;
+                csvContent += `"Luyện nghe chép",${i + 1},"${q.hanzi}","${rec ? (rec.isCorrect ? 'Đúng' : 'Sai') : 'Chưa làm'}","${rec ? rec.userInput : ''}"\n`;
+            });
+            READING_SENTENCES.forEach((q, i) => {
+                const rec = student.reading?.[q.id];
+                csvContent += `"Luyện đọc câu",${i + 1},"${q.hanzi}","${rec?.audioData ? 'Đã ghi âm' : 'Chưa làm'}","${rec?.duration ? rec.duration + 's' : ''}"\n`;
+            });
+            READING_PASSAGES.forEach((q, i) => {
+                const rec = student.reading?.[q.id];
+                csvContent += `"Luyện đọc đoạn văn",${i + 1},"${q.topic}","${rec?.audioData ? 'Đã ghi âm' : 'Chưa làm'}","${rec?.duration ? rec.duration + 's' : ''}"\n`;
+            });
+            SPEAKING_QUESTIONS.forEach((q, i) => {
+                const rec = student.speaking?.[q.id];
+                csvContent += `"Luyện nói",${i + 1},"${q.question}","${rec?.audioData ? 'Đã ghi âm' : 'Chưa làm'}","${rec?.note || ''}"\n`;
             });
 
             downloadCSVFile(csvContent, `KetQua_HSK1_${student.name.replace(/[^a-zA-Z0-9\u00C0-\u1EF9]/g, '_')}.csv`);
@@ -2158,7 +2912,7 @@ function doGet(e) {
         function confirmResetStudentProgress() {
             if (!resetConfirmPending) {
                 resetConfirmPending = true;
-                showToast('Bấm thêm lần nữa để xác nhận xóa toàn bộ điểm của bạn!', 'error');
+                showToast('Bấm thêm lần nữa để xác nhận xóa toàn bộ bài làm & ghi âm của bạn!', 'error');
                 setTimeout(() => { resetConfirmPending = false; }, 4000);
                 return;
             }
@@ -2166,16 +2920,19 @@ function doGet(e) {
             if (currentStudentId && studentsData[currentStudentId]) {
                 studentsData[currentStudentId].ordering = {};
                 studentsData[currentStudentId].dictation = {};
-                // Giữ nguyên số xu, số lượt gợi ý đã dùng và Pinyin đã mở để không làm mới ưu đãi 5 lượt miễn phí.
+                studentsData[currentStudentId].reading = {};
+                studentsData[currentStudentId].speaking = {};
                 saveToLocalStorage();
                 initOrderingQuestion(0);
                 initDictationQuestion(0);
+                renderReadingItem();
+                initSpeakingQuestion(0);
                 showToast('Đã đặt lại bài làm; số xu và lượt gợi ý đã dùng vẫn được giữ.', 'info');
             }
         }
 
         // =========================================================================
-        // 9. GÓC GIÁO VIÊN (TEACHER DASHBOARD) - QUẢN LÝ & TỔNG HỢP LỚP HỌC
+        // 10. GÓC GIÁO VIÊN (TEACHER DASHBOARD + NGHE CHẤM GHI ÂM)
         // =========================================================================
         async function unlockTeacherDashboard(e) {
             e.preventDefault();
@@ -2214,14 +2971,11 @@ function doGet(e) {
                 showToast('Vui lòng dán ít nhất 1 Mã Nộp Bài (HSK1_...) vào ô!', 'error');
                 return;
             }
-
-            // Tách các token theo khoảng trắng hoặc xuống dòng
             const tokens = raw.split(/[\s\n\r]+/).filter(t => t.startsWith('HSK1_'));
             if (tokens.length === 0) {
                 showToast('Không tìm thấy mã hợp lệ bắt đầu bằng "HSK1_".', 'error');
                 return;
             }
-
             let successCount = 0;
             tokens.forEach(tok => {
                 try {
@@ -2232,7 +2986,6 @@ function doGet(e) {
                     console.warn('Mã lỗi:', tok, err);
                 }
             });
-
             if (successCount > 0) {
                 localStorage.setItem(TEACHER_IMPORTED_KEY, JSON.stringify(teacherImportedData));
                 document.getElementById('teacher-import-tokens').value = '';
@@ -2254,15 +3007,12 @@ function doGet(e) {
                     try {
                         const text = e.target.result;
                         const lines = text.split(/\r?\n/).filter(l => l.trim());
-                        // Dòng 2 chứa thông tin tổng hợp: "Tên","Thời gian",ord/100,dic/100,...
                         if (lines.length >= 2) {
                             const cols = lines[1].split(',');
                             const stuName = (cols[0] || file.name).replace(/^"|"$/g, '');
                             const updatedAt = (cols[1] || '').replace(/^"|"$/g, '');
-                            const ordering = {};
-                            const dictation = {};
+                            const ordering = {}, dictation = {};
 
-                            // Đọc chi tiết từng dòng bên dưới
                             for (let i = 4; i < lines.length; i++) {
                                 const row = lines[i].split(',');
                                 if (row.length >= 4) {
@@ -2288,6 +3038,8 @@ function doGet(e) {
                                 updatedAt: updatedAt || new Date().toLocaleString('vi-VN'),
                                 ordering,
                                 dictation,
+                                reading: {},
+                                speaking: {},
                                 isImported: true
                             };
                             processed++;
@@ -2328,12 +3080,9 @@ function doGet(e) {
             }
         }
 
-        async function sendToTeacherWebhook() {
-            await syncStudentToGoogleSheets(false);
-        }
+        async function sendToTeacherWebhook() { await syncStudentToGoogleSheets(false); }
 
         function getCombinedClassList() {
-            // Cloud records are authoritative; local/imported records fill in any entries not yet synced.
             const map = {};
             Object.values(teacherImportedData).forEach(st => { if (st?.id) map[st.id] = st; });
             Object.values(studentsData).forEach(st => { if (st?.id) map[st.id] = st; });
@@ -2342,10 +3091,12 @@ function doGet(e) {
             return Object.values(map).map(st => {
                 const ordCorrect = ORDERING_QUESTIONS.filter(q => st.ordering?.[q.id]?.isCorrect).length;
                 const dicCorrect = DICTATION_QUESTIONS.filter(q => st.dictation?.[q.id]?.isCorrect).length;
-                const total = ordCorrect + dicCorrect;
-                const maxTotal = ORDERING_QUESTIONS.length + DICTATION_QUESTIONS.length;
+                const readDone = Object.values(st.reading || {}).filter(x => x.audioData || x.tokenOnly).length;
+                const spkDone = Object.values(st.speaking || {}).filter(x => x.audioData || x.tokenOnly).length;
+                const total = ordCorrect + dicCorrect + readDone + spkDone;
+                const maxTotal = ORDERING_QUESTIONS.length + DICTATION_QUESTIONS.length + 50;
                 const pct = Math.round((total / maxTotal) * 100);
-                return {...st, coins:Number(st.coins || 0), ordCorrect, dicCorrect, total, maxTotal, pct};
+                return {...st, coins:Number(st.coins || 0), ordCorrect, dicCorrect, readDone, spkDone, total, maxTotal, pct};
             }).sort((a, b) => b.coins - a.coins || b.total - a.total || String(a.name).localeCompare(String(b.name), 'vi'));
         }
 
@@ -2357,7 +3108,7 @@ function doGet(e) {
             top3El.innerHTML = top3.length ? top3.map((st, idx) => {
                 const medals = ['🥇','🥈','🥉'];
                 const labels = ['Hạng 1','Hạng 2','Hạng 3'];
-                return `<div class="rounded-xl border border-amber-100 bg-amber-50/60 p-4"><div class="text-2xl">${medals[idx]}</div><div class="mt-1 text-xs font-bold text-amber-800">${labels[idx]}</div><div class="mt-1 font-bold text-slate-800 truncate">${escapeHtml(st.name)}</div><div class="mt-1 text-lg font-extrabold text-amber-600">${Number(st.coins || 0).toLocaleString('vi-VN')} xu</div><div class="text-[11px] text-slate-500">${st.total}/${st.maxTotal} câu đúng</div></div>`;
+                return `<div class="rounded-xl border border-amber-100 bg-amber-50/60 p-4"><div class="text-2xl">${medals[idx]}</div><div class="mt-1 text-xs font-bold text-amber-800">${labels[idx]}</div><div class="mt-1 font-bold text-slate-800 truncate">${escapeHtml(st.name)}</div><div class="mt-1 text-lg font-extrabold text-amber-600">${Number(st.coins || 0).toLocaleString('vi-VN')} xu</div><div class="text-[11px] text-slate-500">${st.total}/${st.maxTotal} mục hoàn thành</div></div>`;
             }).join('') : '<p class="text-xs text-slate-400">Chưa có dữ liệu học viên.</p>';
 
             const tbody = document.getElementById('teacher-roster-tbody');
@@ -2370,12 +3121,6 @@ function doGet(e) {
                     else if (idx === 1) rankBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold text-xs">🥈 #2</span>`;
                     else if (idx === 2) rankBadge = `<span class="px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-bold text-xs">🥉 #3</span>`;
 
-                    const statusBadge = s.pct >= 80
-                        ? '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Đạt chuẩn HSK 1</span>'
-                        : (s.pct >= 50
-                            ? '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">Đang ôn tập</span>'
-                            : '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">Mới làm</span>');
-
                     return `
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3 px-4">${rankBadge}</td>
@@ -2383,16 +3128,16 @@ function doGet(e) {
                                 <div class="font-bold text-slate-800">${escapeHtml(s.name)}</div>
                                 <span class="text-[11px] text-slate-400">${s.isCloud ? 'Đồng bộ Google Sheets' : (s.isImported ? 'Đã nộp qua Mã/CSV' : 'Học trên máy này')}</span>
                             </td>
-                            <td class="py-3 px-4 text-center font-semibold text-brand-red">${s.ordCorrect}/${ORDERING_QUESTIONS.length}</td>
-                            <td class="py-3 px-4 text-center font-semibold text-brand-teal">${s.dicCorrect}/${DICTATION_QUESTIONS.length}</td>
+                            <td class="py-3 px-4 text-center font-semibold text-brand-red">${s.ordCorrect}/100</td>
+                            <td class="py-3 px-4 text-center font-semibold text-brand-teal">${s.dicCorrect}/100</td>
+                            <td class="py-3 px-4 text-center text-xs font-semibold text-rose-700">Đọc ${s.readDone}/30 · Nói ${s.spkDone}/20</td>
                             <td class="py-3 px-4 text-center font-extrabold text-amber-600">${Number(s.coins || 0).toLocaleString('vi-VN')}</td>
-                            <td class="py-3 px-4 text-center font-extrabold text-slate-800">${s.total}/${s.maxTotal} (${s.pct}%)</td>
-                            <td class="py-3 px-4 text-center">${statusBadge}</td>
+                            <td class="py-3 px-4 text-center font-extrabold text-slate-800">${s.pct}%</td>
                             <td class="py-3 px-4 text-xs text-slate-500">${escapeHtml(s.updatedAt || '')}</td>
                             <td class="py-3 px-4 text-right">
                                 <button onclick="openTeacherStudentDetail('${s.id}')"
-                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">
-                                    Chi tiết
+                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 cursor-pointer">
+                                    <i class="fa-solid fa-headphones mr-1"></i>Chi tiết & Nghe
                                 </button>
                             </td>
                         </tr>
@@ -2400,7 +3145,6 @@ function doGet(e) {
                 }).join('');
             }
 
-            // Thống kê Top câu học viên hay làm sai nhất
             const mistakeMap = {};
             roster.forEach(s => {
                 ORDERING_QUESTIONS.forEach((q, i) => {
@@ -2419,16 +3163,14 @@ function doGet(e) {
 
             const sortedMistakes = Object.entries(mistakeMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
             const weaknessEl = document.getElementById('teacher-weakness-list');
-            if (sortedMistakes.length === 0) {
-                weaknessEl.innerHTML = `<p class="text-slate-400 italic">Chưa ghi nhận lỗi sai nào từ học viên.</p>`;
-            } else {
-                weaknessEl.innerHTML = sortedMistakes.map(([label, count]) => `
+            weaknessEl.innerHTML = sortedMistakes.length === 0
+                ? `<p class="text-slate-400 italic">Chưa ghi nhận lỗi sai nào từ học viên.</p>`
+                : sortedMistakes.map(([label, count]) => `
                     <div class="p-3 rounded-xl bg-rose-50/60 border border-rose-200 flex items-center justify-between gap-2">
                         <span class="font-medium text-slate-800 chinese-text truncate">${escapeHtml(label)}</span>
                         <span class="px-2 py-0.5 rounded-full bg-rose-600 text-white font-bold shrink-0">${count} lượt sai</span>
                     </div>
                 `).join('');
-            }
         }
 
         function openTeacherStudentDetail(studentId) {
@@ -2436,29 +3178,77 @@ function doGet(e) {
             const s = roster.find(x => x.id === studentId);
             if (!s) return;
 
-            document.getElementById('td-modal-name').textContent = `Chi tiết bài làm: ${s.name}`;
-            document.getElementById('td-modal-meta').textContent = `Sắp xếp: ${s.ordCorrect}/100 • Nghe: ${s.dicCorrect}/100 • ${Number(s.coins || 0)} xu • Tổng: ${s.pct}% • Cập nhật: ${s.updatedAt}`;
+            document.getElementById('td-modal-name').textContent = `Chấm bài học viên: ${s.name}`;
+            document.getElementById('td-modal-meta').textContent = `Sắp xếp: ${s.ordCorrect}/100 • Nghe: ${s.dicCorrect}/100 • Đọc: ${s.readDone}/30 • Nói: ${s.spkDone}/20`;
 
             const wrongOrd = ORDERING_QUESTIONS.map((q, i) => ({ q, i, rec: s.ordering?.[q.id] })).filter(x => x.rec && !x.rec.isCorrect);
             const wrongDic = DICTATION_QUESTIONS.map((q, i) => ({ q, i, rec: s.dictation?.[q.id] })).filter(x => x.rec && !x.rec.isCorrect);
 
+            // Thu thập toàn bộ bản ghi âm Đọc & Nói của học viên
+            const audioSubmissions = [];
+            READING_SENTENCES.forEach((q, i) => {
+                const r = s.reading?.[q.id];
+                if (r) audioSubmissions.push({ title: `Đọc câu #${i + 1}`, prompt: q.hanzi, audioData: r.audioData, duration: r.duration, note: '' });
+            });
+            READING_PASSAGES.forEach((q, i) => {
+                const r = s.reading?.[q.id];
+                if (r) audioSubmissions.push({ title: `Đọc đoạn văn #${i + 1}`, prompt: q.topic, audioData: r.audioData, duration: r.duration, note: '' });
+            });
+            SPEAKING_QUESTIONS.forEach((q, i) => {
+                const r = s.speaking?.[q.id];
+                if (r && (r.audioData || r.tokenOnly)) audioSubmissions.push({ title: `Luyện nói #${i + 1}`, prompt: q.question, audioData: r.audioData, duration: r.duration, note: r.note || '' });
+            });
+
             let html = `
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <div class="p-3 rounded-xl bg-orange-50 border border-orange-200">
-                        <div class="text-xs text-slate-500">Sắp xếp câu đúng</div>
-                        <div class="text-xl font-bold text-brand-red">${s.ordCorrect} / 100 câu</div>
+                        <div class="text-[11px] text-slate-500">Sắp xếp câu</div>
+                        <div class="text-lg font-bold text-brand-red">${s.ordCorrect}/100</div>
                     </div>
                     <div class="p-3 rounded-xl bg-teal-50 border border-teal-200">
-                        <div class="text-xs text-slate-500">Luyện nghe chép đúng</div>
-                        <div class="text-xl font-bold text-brand-teal">${s.dicCorrect} / 100 câu</div>
+                        <div class="text-[11px] text-slate-500">Nghe chép</div>
+                        <div class="text-lg font-bold text-brand-teal">${s.dicCorrect}/100</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                        <div class="text-[11px] text-slate-500">Luyện đọc</div>
+                        <div class="text-lg font-bold text-amber-700">${s.readDone}/30</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                        <div class="text-[11px] text-slate-500">Luyện nói</div>
+                        <div class="text-lg font-bold text-rose-700">${s.spkDone}/20</div>
                     </div>
                 </div>
             `;
 
+            // Audio Recordings Section for Teacher Grading
+            html += `<div>
+                <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-microphone-lines text-rose-600"></i>
+                    Bài ghi âm Luyện đọc & Luyện nói (${audioSubmissions.length} bài):
+                </h4>
+                ${audioSubmissions.length === 0 ? '<p class="text-xs text-slate-400 italic">Học viên chưa ghi âm bài đọc/nói nào.</p>' : `
+                    <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                        ${audioSubmissions.map(sub => `
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-brand-red">${escapeHtml(sub.title)}</span>
+                                    <span class="text-slate-400">${sub.duration ? sub.duration + 's' : 'Nộp qua Mã'}</span>
+                                </div>
+                                <p class="text-xs font-medium text-slate-800 chinese-text">${escapeHtml(sub.prompt)}</p>
+                                ${sub.note ? `<p class="text-xs text-brand-teal chinese-text">Ghi chú HS: ${escapeHtml(sub.note)}</p>` : ''}
+                                ${sub.audioData
+                                    ? `<audio controls src="${sub.audioData}" class="w-full h-9 mt-1"></audio>`
+                                    : `<p class="text-[11px] text-amber-700 italic">Bản ghi âm lưu trên máy học viên hoặc đồng bộ qua Google Sheets.</p>`}
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            </div>`;
+
             html += `<div>
                 <h4 class="font-bold text-rose-700 mb-2">Các câu Sắp xếp làm sai (${wrongOrd.length} câu):</h4>
                 ${wrongOrd.length === 0 ? '<p class="text-xs text-slate-400 italic">Không có câu sai.</p>' : `
-                    <div class="space-y-1.5 max-h-40 overflow-y-auto">
+                    <div class="space-y-1.5 max-h-36 overflow-y-auto">
                         ${wrongOrd.map(item => `
                             <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs flex justify-between">
                                 <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${item.q.answer}</span></span>
@@ -2472,7 +3262,7 @@ function doGet(e) {
             html += `<div>
                 <h4 class="font-bold text-rose-700 mb-2">Các câu Nghe chép làm sai (${wrongDic.length} câu):</h4>
                 ${wrongDic.length === 0 ? '<p class="text-xs text-slate-400 italic">Không có câu sai.</p>' : `
-                    <div class="space-y-1.5 max-h-40 overflow-y-auto">
+                    <div class="space-y-1.5 max-h-36 overflow-y-auto">
                         ${wrongDic.map(item => `
                             <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs flex justify-between">
                                 <span><strong>#${item.i + 1}:</strong> <span class="chinese-text">${item.q.hanzi}</span></span>
@@ -2508,134 +3298,101 @@ function doGet(e) {
                 showToast('Chưa có dữ liệu học viên để xuất file!', 'error');
                 return;
             }
-
             let csv = '\uFEFF';
-            csv += 'Hạng,Họ tên học viên,Sắp xếp câu (/100),Luyện nghe chép (/100),Xu,Tổng điểm (/200),Tỷ lệ đạt (%),Đánh giá,Thời gian cập nhật\n';
+            csv += 'Hạng,Họ tên học viên,Sắp xếp (/100),Nghe chép (/100),Luyện đọc (/30),Luyện nói (/20),Xu,Tỷ lệ đạt (%),Thời gian cập nhật\n';
             roster.forEach((s, i) => {
-                const rankLabel = s.pct >= 80 ? 'Đạt chuẩn HSK 1' : (s.pct >= 50 ? 'Đang ôn tập' : 'Cần luyện thêm');
-                csv += `${i + 1},"${s.name}",${s.ordCorrect},${s.dicCorrect},${Number(s.coins || 0)},${s.total},${s.pct}%,"${rankLabel}","${s.updatedAt}"\n`;
+                csv += `${i + 1},"${s.name}",${s.ordCorrect},${s.dicCorrect},${s.readDone},${s.spkDone},${Number(s.coins || 0)},${s.pct}%,"${s.updatedAt}"\n`;
             });
-
             downloadCSVFile(csv, `BangDiem_Lop_HSK1_${new Date().toISOString().slice(0,10)}.csv`);
             showToast('Đã xuất bảng điểm tổng kết cả lớp ra file CSV!', 'success');
         }
 
         // =========================================================================
-        // 10. CHỨC NĂNG HỌC PHÁT ÂM TIẾNG TRUNG (PHỤ ÂM & NGUYÊN ÂM)
+        // 11. CHỨC NĂNG HỌC PHÁT ÂM TIẾNG TRUNG (PHỤ ÂM & NGUYÊN ÂM)
         // =========================================================================
         const PRONUNCIATION_INITIALS = [
-            {
-                group: 'Âm hai môi & môi - răng',
-                items: [
-                    { pinyin: 'b', speakText: '玻', desc: 'Đọc gần như "p" (không bật hơi)' },
-                    { pinyin: 'p', speakText: '坡', desc: 'Đọc như "ph/p" và bật hơi mạnh' },
-                    { pinyin: 'm', speakText: '摸', desc: 'Đọc như "m" tiếng Việt' },
-                    { pinyin: 'f', speakText: '佛', desc: 'Đọc như "ph" tiếng Việt' }
-                ]
-            },
-            {
-                group: 'Âm đầu lưỡi giữa',
-                items: [
-                    { pinyin: 'd', speakText: '得', desc: 'Đọc gần như "t" (không bật hơi)' },
-                    { pinyin: 't', speakText: '特', desc: 'Đọc như "th" và bật hơi mạnh' },
-                    { pinyin: 'n', speakText: '呢', desc: 'Đọc như "n" tiếng Việt' },
-                    { pinyin: 'l', speakText: '勒', desc: 'Đọc như "l" tiếng Việt' }
-                ]
-            },
-            {
-                group: 'Âm cuống lưỡi',
-                items: [
-                    { pinyin: 'g', speakText: '哥', desc: 'Đọc gần như "c/k" (không bật hơi)' },
-                    { pinyin: 'k', speakText: '科', desc: 'Đọc như "kh" và bật hơi mạnh' },
-                    { pinyin: 'h', speakText: '喝', desc: 'Đọc giữa "h" và "kh"' }
-                ]
-            },
-            {
-                group: 'Âm mặt lưỡi',
-                items: [
-                    { pinyin: 'j', speakText: '基', desc: 'Đọc gần như "ch" (mặt lưỡi chạm ngạc)' },
-                    { pinyin: 'q', speakText: '欺', desc: 'Đọc như "ch" và bật hơi mạnh' },
-                    { pinyin: 'x', speakText: '希', desc: 'Đọc gần như "x" nhẹ' }
-                ]
-            },
-            {
-                group: 'Âm đầu lưỡi sau (uốn lưỡi)',
-                items: [
-                    { pinyin: 'zh', speakText: '知', desc: 'Uốn lưỡi, đọc gần như "tr" (không bật hơi)' },
-                    { pinyin: 'ch', speakText: '吃', desc: 'Uốn lưỡi, đọc như "tr" và bật hơi mạnh' },
-                    { pinyin: 'sh', speakText: '诗', desc: 'Uốn lưỡi, đọc như "s" nặng' },
-                    { pinyin: 'r', speakText: '日', desc: 'Uốn lưỡi, đọc gần như "r/d"' }
-                ]
-            },
-            {
-                group: 'Âm đầu lưỡi trước & bán nguyên âm',
-                items: [
-                    { pinyin: 'z', speakText: '资', desc: 'Đầu lưỡi thẳng, đọc gần như "ch/tx"' },
-                    { pinyin: 'c', speakText: '雌', desc: 'Đầu lưỡi thẳng, đọc như "tx" bật hơi' },
-                    { pinyin: 's', speakText: '思', desc: 'Đầu lưỡi thẳng, đọc như "x"' },
-                    { pinyin: 'y', speakText: '衣', desc: 'Bán nguyên âm đứng trước i / ü' },
-                    { pinyin: 'w', speakText: '乌', desc: 'Bán nguyên âm đứng trước u' }
-                ]
-            }
+            { group: 'Âm hai môi & môi - răng', items: [
+                { pinyin: 'b', speakText: '玻', desc: 'Đọc gần như "p" (không bật hơi)' },
+                { pinyin: 'p', speakText: '坡', desc: 'Đọc như "ph/p" và bật hơi mạnh' },
+                { pinyin: 'm', speakText: '摸', desc: 'Đọc như "m" tiếng Việt' },
+                { pinyin: 'f', speakText: '佛', desc: 'Đọc như "ph" tiếng Việt' }
+            ]},
+            { group: 'Âm đầu lưỡi giữa', items: [
+                { pinyin: 'd', speakText: '得', desc: 'Đọc gần như "t" (không bật hơi)' },
+                { pinyin: 't', speakText: '特', desc: 'Đọc như "th" và bật hơi mạnh' },
+                { pinyin: 'n', speakText: '呢', desc: 'Đọc như "n" tiếng Việt' },
+                { pinyin: 'l', speakText: '勒', desc: 'Đọc như "l" tiếng Việt' }
+            ]},
+            { group: 'Âm cuống lưỡi', items: [
+                { pinyin: 'g', speakText: '哥', desc: 'Đọc gần như "c/k" (không bật hơi)' },
+                { pinyin: 'k', speakText: '科', desc: 'Đọc như "kh" và bật hơi mạnh' },
+                { pinyin: 'h', speakText: '喝', desc: 'Đọc giữa "h" và "kh"' }
+            ]},
+            { group: 'Âm mặt lưỡi', items: [
+                { pinyin: 'j', speakText: '基', desc: 'Đọc gần như "ch" (mặt lưỡi chạm ngạc)' },
+                { pinyin: 'q', speakText: '欺', desc: 'Đọc như "ch" và bật hơi mạnh' },
+                { pinyin: 'x', speakText: '希', desc: 'Đọc gần như "x" nhẹ' }
+            ]},
+            { group: 'Âm đầu lưỡi sau (uốn lưỡi)', items: [
+                { pinyin: 'zh', speakText: '知', desc: 'Uốn lưỡi, đọc gần như "tr" (không bật hơi)' },
+                { pinyin: 'ch', speakText: '吃', desc: 'Uốn lưỡi, đọc như "tr" và bật hơi mạnh' },
+                { pinyin: 'sh', speakText: '诗', desc: 'Uốn lưỡi, đọc như "s" nặng' },
+                { pinyin: 'r', speakText: '日', desc: 'Uốn lưỡi, đọc gần như "r/d"' }
+            ]},
+            { group: 'Âm đầu lưỡi trước & bán nguyên âm', items: [
+                { pinyin: 'z', speakText: '资', desc: 'Đầu lưỡi thẳng, đọc gần như "ch/tx"' },
+                { pinyin: 'c', speakText: '雌', desc: 'Đầu lưỡi thẳng, đọc như "tx" bật hơi' },
+                { pinyin: 's', speakText: '思', desc: 'Đầu lưỡi thẳng, đọc như "x"' },
+                { pinyin: 'y', speakText: '衣', desc: 'Bán nguyên âm đứng trước i / ü' },
+                { pinyin: 'w', speakText: '乌', desc: 'Bán nguyên âm đứng trước u' }
+            ]}
         ];
 
         const PRONUNCIATION_FINALS = [
-            {
-                group: 'Nguyên âm đơn (单韵母)',
-                items: [
-                    { pinyin: 'a', speakText: '啊', desc: 'Đọc như "a"' },
-                    { pinyin: 'o', speakText: '喔', desc: 'Đọc như "ô" tròn môi' },
-                    { pinyin: 'e', speakText: '鹅', desc: 'Đọc giữa "ơ" và "ưa"' },
-                    { pinyin: 'i', speakText: '衣', desc: 'Đọc như "i"' },
-                    { pinyin: 'u', speakText: '乌', desc: 'Đọc như "u" tròn môi' },
-                    { pinyin: 'ü', speakText: '迂', desc: 'Khẩu hình "i" nhưng tròn môi như "u"' },
-                    { pinyin: 'er', speakText: '儿', desc: 'Đọc "ơ" đồng thời uốn cong đầu lưỡi' }
-                ]
-            },
-            {
-                group: 'Nguyên âm kép (复韵母)',
-                items: [
-                    { pinyin: 'ai', speakText: '哀', desc: 'Đọc như "ai"' },
-                    { pinyin: 'ei', speakText: '诶', desc: 'Đọc như "ây"' },
-                    { pinyin: 'ao', speakText: '熬', desc: 'Đọc như "ao"' },
-                    { pinyin: 'ou', speakText: '欧', desc: 'Đọc như "âu"' },
-                    { pinyin: 'ia', speakText: '呀', desc: 'Đọc nối "i + a"' },
-                    { pinyin: 'ie', speakText: '耶', desc: 'Đọc như "iê"' },
-                    { pinyin: 'iao', speakText: '腰', desc: 'Đọc nối "i + ao"' },
-                    { pinyin: 'iu (iou)', speakText: '优', desc: 'Đọc như "iêu"' },
-                    { pinyin: 'ua', speakText: '蛙', desc: 'Đọc nối "u + a"' },
-                    { pinyin: 'uo', speakText: '窝', desc: 'Đọc như "uô"' },
-                    { pinyin: 'uai', speakText: '歪', desc: 'Đọc nối "u + ai"' },
-                    { pinyin: 'ui (uei)', speakText: '威', desc: 'Đọc như "uây"' },
-                    { pinyin: 'üe', speakText: '约', desc: 'Đọc nối "ü + ê"' }
-                ]
-            },
-            {
-                group: 'Nguyên âm mũi trước -n (前鼻韵母)',
-                items: [
-                    { pinyin: 'an', speakText: '安', desc: 'Đọc như "an"' },
-                    { pinyin: 'en', speakText: '恩', desc: 'Đọc như "ân"' },
-                    { pinyin: 'in', speakText: '因', desc: 'Đọc như "in"' },
-                    { pinyin: 'ün', speakText: '晕', desc: 'Đọc nối "ü + n"' },
-                    { pinyin: 'ian', speakText: '烟', desc: 'Đọc gần như "iên"' },
-                    { pinyin: 'uan', speakText: '弯', desc: 'Đọc nối "u + an"' },
-                    { pinyin: 'un (uen)', speakText: '温', desc: 'Đọc như "uân"' },
-                    { pinyin: 'üan', speakText: '冤', desc: 'Đọc nối "ü + an"' }
-                ]
-            },
-            {
-                group: 'Nguyên âm mũi sau -ng (后鼻韵母)',
-                items: [
-                    { pinyin: 'ang', speakText: '昂', desc: 'Đọc "ang" mở rộng khoang miệng' },
-                    { pinyin: 'eng', speakText: '亨', desc: 'Đọc "âng" vang cuống họng' },
-                    { pinyin: 'ing', speakText: '英', desc: 'Đọc "ing" vang cuống họng' },
-                    { pinyin: 'ong', speakText: '轰', desc: 'Đọc gần như "ung"' },
-                    { pinyin: 'iang', speakText: '央', desc: 'Đọc nối "i + ang"' },
-                    { pinyin: 'uang', speakText: '汪', desc: 'Đọc nối "u + ang"' },
-                    { pinyin: 'ueng', speakText: '翁', desc: 'Đọc nối "u + eng"' },
-                    { pinyin: 'iong', speakText: '拥', desc: 'Đọc nối "i + ong"' }
-                ]
-            }
+            { group: 'Nguyên âm đơn (单韵母)', items: [
+                { pinyin: 'a', speakText: '啊', desc: 'Đọc như "a"' },
+                { pinyin: 'o', speakText: '喔', desc: 'Đọc như "ô" tròn môi' },
+                { pinyin: 'e', speakText: '鹅', desc: 'Đọc giữa "ơ" và "ưa"' },
+                { pinyin: 'i', speakText: '衣', desc: 'Đọc như "i"' },
+                { pinyin: 'u', speakText: '乌', desc: 'Đọc như "u" tròn môi' },
+                { pinyin: 'ü', speakText: '迂', desc: 'Khẩu hình "i" nhưng tròn môi như "u"' },
+                { pinyin: 'er', speakText: '儿', desc: 'Đọc "ơ" đồng thời uốn cong đầu lưỡi' }
+            ]},
+            { group: 'Nguyên âm kép (复韵母)', items: [
+                { pinyin: 'ai', speakText: '哀', desc: 'Đọc như "ai"' },
+                { pinyin: 'ei', speakText: '诶', desc: 'Đọc như "ây"' },
+                { pinyin: 'ao', speakText: '熬', desc: 'Đọc như "ao"' },
+                { pinyin: 'ou', speakText: '欧', desc: 'Đọc như "âu"' },
+                { pinyin: 'ia', speakText: '呀', desc: 'Đọc nối "i + a"' },
+                { pinyin: 'ie', speakText: '耶', desc: 'Đọc như "iê"' },
+                { pinyin: 'iao', speakText: '腰', desc: 'Đọc nối "i + ao"' },
+                { pinyin: 'iu (iou)', speakText: '优', desc: 'Đọc như "iêu"' },
+                { pinyin: 'ua', speakText: '蛙', desc: 'Đọc nối "u + a"' },
+                { pinyin: 'uo', speakText: '窝', desc: 'Đọc như "uô"' },
+                { pinyin: 'uai', speakText: '歪', desc: 'Đọc nối "u + ai"' },
+                { pinyin: 'ui (uei)', speakText: '威', desc: 'Đọc như "uây"' },
+                { pinyin: 'üe', speakText: '约', desc: 'Đọc nối "ü + ê"' }
+            ]},
+            { group: 'Nguyên âm mũi trước -n (前鼻韵母)', items: [
+                { pinyin: 'an', speakText: '安', desc: 'Đọc như "an"' },
+                { pinyin: 'en', speakText: '恩', desc: 'Đọc như "ân"' },
+                { pinyin: 'in', speakText: '因', desc: 'Đọc như "in"' },
+                { pinyin: 'ün', speakText: '晕', desc: 'Đọc nối "ü + n"' },
+                { pinyin: 'ian', speakText: '烟', desc: 'Đọc gần như "iên"' },
+                { pinyin: 'uan', speakText: '弯', desc: 'Đọc nối "u + an"' },
+                { pinyin: 'un (uen)', speakText: '温', desc: 'Đọc như "uân"' },
+                { pinyin: 'üan', speakText: '冤', desc: 'Đọc nối "ü + an"' }
+            ]},
+            { group: 'Nguyên âm mũi sau -ng (后鼻韵母)', items: [
+                { pinyin: 'ang', speakText: '昂', desc: 'Đọc "ang" mở rộng khoang miệng' },
+                { pinyin: 'eng', speakText: '亨', desc: 'Đọc "âng" vang cuống họng' },
+                { pinyin: 'ing', speakText: '英', desc: 'Đọc "ing" vang cuống họng' },
+                { pinyin: 'ong', speakText: '轰', desc: 'Đọc gần như "ung"' },
+                { pinyin: 'iang', speakText: '央', desc: 'Đọc nối "i + ang"' },
+                { pinyin: 'uang', speakText: '汪', desc: 'Đọc nối "u + ang"' },
+                { pinyin: 'ueng', speakText: '翁', desc: 'Đọc nối "u + eng"' },
+                { pinyin: 'iong', speakText: '拥', desc: 'Đọc nối "i + ong"' }
+            ]}
         ];
 
         let pronunciationRate = 1.0;
@@ -2733,34 +3490,22 @@ function doGet(e) {
             if (btn) {
                 btn.innerHTML = `<i class="fa-solid fa-gauge-high"></i><span>Tốc độ: ${pronunciationRate === 1.0 ? '1.0x' : '0.65x (Chậm)'}</span>`;
             }
-            if (lastPronunciationItem) {
-                replayLastPronunciation();
-            }
+            if (lastPronunciationItem) replayLastPronunciation();
         }
 
         function setPronunciationFilter(mode) {
             const initBlock = document.getElementById('pron-initials-block');
             const finBlock = document.getElementById('pron-finals-block');
-
-            if (mode === 'all') {
-                initBlock.classList.remove('hidden');
-                finBlock.classList.remove('hidden');
-            } else if (mode === 'initials') {
-                initBlock.classList.remove('hidden');
-                finBlock.classList.add('hidden');
-            } else if (mode === 'finals') {
-                initBlock.classList.add('hidden');
-                finBlock.classList.remove('hidden');
-            }
+            if (mode === 'all') { initBlock.classList.remove('hidden'); finBlock.classList.remove('hidden'); }
+            else if (mode === 'initials') { initBlock.classList.remove('hidden'); finBlock.classList.add('hidden'); }
+            else if (mode === 'finals') { initBlock.classList.add('hidden'); finBlock.classList.remove('hidden'); }
 
             ['all', 'initials', 'finals'].forEach(key => {
                 const btn = document.getElementById(`pron-filter-${key}`);
                 if (!btn) return;
-                if (key === mode) {
-                    btn.className = 'px-3 py-1.5 rounded-lg bg-white text-slate-800 shadow-2xs transition cursor-pointer';
-                } else {
-                    btn.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
-                }
+                btn.className = key === mode
+                    ? 'px-3 py-1.5 rounded-lg bg-white text-slate-800 shadow-2xs transition cursor-pointer'
+                    : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
             });
         }
     </script>
